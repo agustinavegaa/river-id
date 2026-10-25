@@ -1,0 +1,34 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Colección de partidos: cada documento tiene un campo "uid"
+    // con el identificador del usuario (anónimo) que lo creó.
+    match /matches/{matchId} {
+
+      // Leer y eliminar: solo el dueño del partido.
+      allow read, delete: if request.auth != null
+        && resource.data.uid == request.auth.uid;
+
+      // Crear: el usuario tiene que estar autenticado, guardar su propio uid
+      // y completar rival y fecha.
+      allow create: if request.auth != null
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.rival is string
+        && request.resource.data.rival.size() > 0
+        && request.resource.data.date is string
+        && request.resource.data.date.size() > 0;
+
+      // Modificar: solo el dueño, y no puede cambiar el uid del partido.
+      allow update: if request.auth != null
+        && resource.data.uid == request.auth.uid
+        && request.resource.data.uid == request.auth.uid;
+    }
+
+    // Cualquier otra colección queda cerrada.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1,0 +1,18 @@
+# Dependencias
+node_modules
+
+# Build
+dist
+
+# Variables de entorno (contienen los datos de nuestro proyecto de Firebase)
+.env
+.env.local
+.env.*.local
+
+# Sistema / editor
+.DS_Store
+.vscode
+*.log
+
+# Configuración local de herramientas
+.claude
