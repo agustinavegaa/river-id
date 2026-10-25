@@ -135,11 +135,21 @@ Se configuró el proyecto de Firebase (Authentication anónima, Firestore en mod
 - [x] Eliminar con confirmación: mensaje "Partido eliminado." y, al recargar, vuelve el estado vacío.
 - [x] Consola del navegador sin errores.
 
+**Versión publicada en Vercel (24/10/2026, https://river-id-ez6q.vercel.app)**
+
+Se subió el código a GitHub (https://github.com/agustinavegaa/river-id), se importó en Vercel y se cargaron las 4 variables `VITE_FIREBASE_*` en Environment Variables.
+
+- [x] La app publicada carga y se conecta a Firebase (estado vacío, consola sin errores).
+- [x] Agregar "PRUEBA Vercel" 1 – 0: mensaje de éxito y, al recargar, el partido sigue.
+- [x] Marcar como favorito: mensaje "Agregado a favoritos." y, al recargar, sigue marcado (el contador de favoritos muestra 1).
+- [x] Vista celular (375 px) de la versión publicada: barra inferior, sin scroll horizontal.
+- [x] Eliminar con confirmación: mensaje "Partido eliminado." y, al recargar, vuelve el estado vacío.
+
 **Pendientes**
 
 - [ ] Ver el registro en Firebase Console → Firestore → Datos (para la captura de la entrega).
 - [ ] Comprobar que otro usuario no ve los datos (por ejemplo, abrir la app en una ventana de incógnito).
-- [ ] Repetir todo desde la URL de Vercel y desde un celular real.
+- [ ] Probar desde un celular real.
 
 ### Estado de los requisitos de la consigna
 
@@ -148,8 +158,8 @@ Se configuró el proyecto de Firebase (Authentication anónima, Firestore en mod
 | 1. React + Vite con componentes, eventos y estado | Hecho |
 | 2. Firestore: consultar, agregar, modificar, eliminar | Hecho y probado en local |
 | 3. Persistencia al recargar | Hecho y probado en local |
-| 4. GitHub con código e instrucciones | Archivos listos — falta crear el repositorio |
-| 5. Vercel con URL funcional | Configuración lista — falta desplegar |
+| 4. GitHub con código e instrucciones | Hecho: https://github.com/agustinavegaa/river-id |
+| 5. Vercel con URL funcional | Hecho y probado: https://river-id-ez6q.vercel.app |
 | 6. Validaciones, carga, éxito/error, responsive | Hecho y probado (con servicios simulados) |
 | 7. Reglas de Firestore | Publicadas; acceso sin login rechazado |
 | Bitácora e informe | En curso (este documento) |

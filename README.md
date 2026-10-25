@@ -4,7 +4,7 @@ Aplicación web para hinchas de River Plate: un **diario digital del hincha** do
 
 > Proyecto no oficial, desarrollado para el Trabajo Práctico 2 de **Desarrollo Frontend II** (2026).
 
-- **App publicada:** _(completar con la URL de Vercel)_
+- **App publicada:** https://river-id-ez6q.vercel.app
 - **Repositorio:** https://github.com/agustinavegaa/river-id
 
 ## Tecnologías
