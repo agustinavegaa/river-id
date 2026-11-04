@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react'
 import ConfirmDialog from './components/ConfirmDialog'
 import Loader from './components/Loader'
 import Logo from './components/Logo'
+import Header from './components/Header'
 import MatchForm from './components/MatchForm'
-import Navbar from './components/Navbar'
+import PageHeader from './components/PageHeader'
 import Toast from './components/Toast'
 import { isFirebaseConfigured } from './firebase/config'
 import HomePage from './pages/HomePage'
@@ -46,6 +47,11 @@ function App() {
   useEffect(() => {
     if (user) loadMatches(user.uid)
   }, [user])
+
+  // Al cambiar de pantalla, volvemos al principio de la página.
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [currentPage])
 
   // Los mensajes desaparecen solos después de unos segundos.
   useEffect(() => {
@@ -160,26 +166,27 @@ function App() {
 
   return (
     <div className="app">
-      <Navbar currentPage={currentPage} onNavigate={setCurrentPage} />
+      <Header currentPage={currentPage} onNavigate={setCurrentPage} onAdd={() => actions.onAdd()} />
 
       <main className="main">
-        {/* Encabezado solo visible en celulares */}
-        <div className="mobile-header">
-          <Logo size={30} />
-          <strong>RIVER ID</strong>
-        </div>
-
-        {loading ? (
-          <Loader text="Cargando tu historial de hincha..." />
-        ) : loadError ? (
-          <div className="error-box" role="alert">
-            <p>{loadError}</p>
-            {user && (
-              <button className="btn btn-primary" onClick={() => loadMatches(user.uid)}>
-                Reintentar
-              </button>
-            )}
-          </div>
+        {loading || loadError ? (
+          <>
+            <PageHeader kicker="Mi vida como hincha" title="River ID" />
+            <div className="sheet">
+              {loading ? (
+                <Loader text="Cargando tu historial de hincha..." />
+              ) : (
+                <div className="error-box" role="alert">
+                  <p>{loadError}</p>
+                  {user && (
+                    <button className="btn btn-primary" onClick={() => loadMatches(user.uid)}>
+                      Reintentar
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+          </>
         ) : (
           renderPage()
         )}

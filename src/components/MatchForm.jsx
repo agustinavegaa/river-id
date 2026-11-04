@@ -5,6 +5,7 @@ import { COMPETITIONS, STATUS, STATUS_LABELS } from '../utils/matchUtils'
 const EMPTY_FORM = {
   rival: '',
   date: '',
+  time: '',
   competition: '',
   stadium: '',
   riverGoals: '',
@@ -20,6 +21,7 @@ function toFormValues(match, defaults) {
   return {
     rival: match.rival ?? '',
     date: match.date ?? '',
+    time: match.time ?? '',
     competition: match.competition ?? '',
     stadium: match.stadium ?? '',
     riverGoals: match.riverGoals ?? '',
@@ -72,6 +74,7 @@ function MatchForm({ match, defaults, onSave, onClose }) {
     const data = {
       rival: values.rival.trim(),
       date: values.date,
+      time: values.time,
       competition: values.competition,
       stadium: values.stadium.trim(),
       riverGoals: values.riverGoals === '' ? null : Number(values.riverGoals),
@@ -90,20 +93,20 @@ function MatchForm({ match, defaults, onSave, onClose }) {
   return (
     <Modal title={isEditing ? 'Editar partido' : 'Agregar partido'} onClose={saving ? () => {} : onClose}>
       <form className="match-form" onSubmit={handleSubmit} noValidate>
-        <div className="form-row">
-          <label className="field">
-            <span>Rival *</span>
-            <input
-              name="rival"
-              value={values.rival}
-              onChange={handleChange}
-              placeholder="Ej: Boca Juniors"
-              aria-invalid={Boolean(errors.rival)}
-              autoFocus
-            />
-            {errors.rival && <small className="field-error">{errors.rival}</small>}
-          </label>
+        <label className="field">
+          <span>Rival *</span>
+          <input
+            name="rival"
+            value={values.rival}
+            onChange={handleChange}
+            placeholder="Ej: Boca Juniors"
+            aria-invalid={Boolean(errors.rival)}
+            autoFocus
+          />
+          {errors.rival && <small className="field-error">{errors.rival}</small>}
+        </label>
 
+        <div className="form-row">
           <label className="field">
             <span>Fecha *</span>
             <input
@@ -114,6 +117,12 @@ function MatchForm({ match, defaults, onSave, onClose }) {
               aria-invalid={Boolean(errors.date)}
             />
             {errors.date && <small className="field-error">{errors.date}</small>}
+          </label>
+
+          <label className="field">
+            <span>Hora</span>
+            <input type="time" name="time" value={values.time} onChange={handleChange} />
+            <small className="field-hint">Opcional. Se usa en la cuenta regresiva.</small>
           </label>
         </div>
 

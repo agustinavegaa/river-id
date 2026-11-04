@@ -12,14 +12,15 @@ Aplicación web para hinchas de River Plate: un **diario digital del hincha** do
 - [React](https://react.dev/) + [Vite](https://vite.dev/)
 - [Firebase](https://firebase.google.com/): Cloud Firestore (base de datos) y Authentication anónima
 - [Lucide React](https://lucide.dev/) (íconos)
+- Google Fonts: Anton (títulos) e Inter (textos)
 - Vercel (despliegue)
 
-## Funcionalidades (versión 1)
+## Funcionalidades (versión 2)
 
-- **Inicio:** bienvenida, botón "Agregar partido", tarjetas de estadísticas, próximo partido y últimos partidos.
-- **Mis partidos:** agregar, consultar, editar y eliminar partidos; marcar favoritos; comentario personal; filtros por estado.
-- **Próximos:** partidos con estado "Próximo"; se pueden marcar como "Asistí" o "No asistí".
-- **Estadísticas:** partidos asistidos, victorias, empates, derrotas, porcentaje de victorias y favoritos.
+- **Inicio:** portada con cuenta regresiva al próximo partido, carrusel de últimos partidos, sección "Sobre River ID" y banner con tu récord.
+- **Mis partidos:** agregar, consultar, editar y eliminar partidos; marcar favoritos; comentario personal; búsqueda por rival y filtros por estado.
+- **Próximos:** partidos con estado "Próximo", con cuenta regresiva y aviso cuando un partido ya se jugó; se pueden marcar como "Asistí" o "No asistí".
+- **Estadísticas:** porcentaje de victorias, partidos asistidos, victorias, empates, derrotas, favoritos y datos curiosos (rival, estadio y competición más vistos).
 
 ## Instalación y ejecución local
 
@@ -69,6 +70,7 @@ Colección `matches`. Cada documento es un partido:
 | `uid`         | string             | ID del usuario anónimo dueño del registro        |
 | `rival`       | string             | Nombre del rival (obligatorio)                   |
 | `date`        | string             | Fecha `AAAA-MM-DD` (obligatoria)                 |
+| `time`        | string             | Hora `HH:MM` (opcional, desde la versión 2)      |
 | `competition` | string             | Competición                                      |
 | `stadium`     | string             | Estadio o ubicación                              |
 | `riverGoals`  | number \| null     | Goles de River (`null` = sin resultado)          |

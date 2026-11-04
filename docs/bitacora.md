@@ -163,7 +163,7 @@ Se subió el código a GitHub (https://github.com/agustinavegaa/river-id), se im
 | 6. Validaciones, carga, éxito/error, responsive | Hecho y probado (con servicios simulados) |
 | 7. Reglas de Firestore | Publicadas; acceso sin login rechazado |
 | Bitácora e informe | En curso (este documento) |
-| Tres iteraciones | Versión 1 de 3 |
+| Tres iteraciones | Versión 2 de 3 (en rama `version-2`) |
 
 ### Capturas
 
@@ -171,6 +171,78 @@ _(Agregar capturas de: Inicio vacío, formulario con errores, Mis partidos, Pró
 
 ---
 
-## Versión 2 — _(pendiente)_
+## Versión 2 — Rediseño y mejoras de uso
+
+**Fecha:** 04/11/2026 · **Rama:** `version-2`
+
+### Qué cambió respecto de la versión 1
+
+**Diseño (inspirado en una referencia de landing deportiva, manteniendo la paleta de River)**
+
+| Antes (V1) | Ahora (V2) | Por qué |
+| --- | --- | --- |
+| Barra lateral negra fija | Header oscuro con menú en "píldora" centrado y botón "Agregar partido" | Libera ancho para el contenido y se parece más a una app deportiva actual. |
+| Títulos en sans serif común | Títulos en **Anton** (condensada, mayúsculas) y textos en Inter | La tipografía condensada da la fuerza de un póster de fútbol; Inter mantiene la lectura cómoda. |
+| Hero con banda roja diagonal | Portada oscura de cada pantalla + **hoja blanca redondeada** que se superpone | Separa claramente la "portada" del contenido y da profundidad sin usar sombras pesadas. |
+| Últimos partidos en grilla | **Carrusel horizontal** de tarjetas verticales (se desliza o se arrastra) | Muestra varios partidos sin ocupar mucho alto; en celular se usa con el dedo. |
+| Estadísticas en tarjetas iguales | Bloque rojo grande con el % de victorias + tarjetas + "Datos curiosos" | Jerarquía: primero el dato más importante. |
+| — | Sección "Sobre River ID" y banner "Tu récord en la cancha" con panel rojo de números | Explica la app a quien entra por primera vez y lleva a Estadísticas. |
+| Botones con bordes de 8 px | Botones tipo píldora y botones circulares | Coherencia con el menú y con la referencia. |
+
+En la referencia el color de acento era verde lima; se reemplazó por el **rojo River (#9E182B)**. Negro #171717, blanco y gris claro siguen como base.
+
+Los lugares donde irán fotos (portada, banner, tarjetas del carrusel) quedaron como **bloques de color** con la clase `img-ph`, para reemplazarlos por imágenes en una próxima versión. Las tarjetas del carrusel cambian de color según el resultado: rojo (victoria), gris (empate), negro (derrota).
+
+**Funcionalidades nuevas**
+
+- [x] Campo **Hora** (opcional) en el formulario. Se guarda en Firestore como `time` (`HH:MM`).
+- [x] **Cuenta regresiva** (días, horas, minutos) al próximo partido, en Inicio y en Próximos. Se actualiza sola cada 30 segundos.
+- [x] Tarjeta con fecha, hora y estadio del próximo partido; si no hay, un acceso para agendarlo.
+- [x] **Búsqueda por rival** en Mis partidos (se combina con los filtros).
+- [x] **Aviso de partidos vencidos**: un "Próximo" cuya fecha ya pasó se marca en rojo con "Este partido ya se jugó. ¿Fuiste?" y aparece un resumen arriba de la lista.
+- [x] **Datos curiosos** en Estadísticas: rival, estadio y competición que más viste.
+- [x] Al cambiar de pantalla, la página vuelve arriba.
+
+### Herramientas de IA y prompt
+
+- **Claude (Claude Code, app de escritorio)**.
+- Prompt: se adjuntó una imagen de referencia (landing "Athlete Showcase") con el pedido: *"tomá de referencia el diseño, mantené los colores de River: rojo, blanco y gris/negro… las imágenes las agregamos después, dejalos en color y seguí con el plan de mejoras"*.
+
+### Dificultades y cómo se resolvieron
+
+| Dificultad | Solución |
+| --- | --- |
+| El carrusel arrancaba pegado al borde izquierdo. | El "scroll snap" ignora el padding; se agregó `scroll-padding-inline`. |
+| "Independiente" se cortaba en cualquier letra dentro de la tarjeta. | Se cambió `overflow-wrap: anywhere` por `break-word` + `hyphens: auto` (corta con guion: "Indepen-diente"). |
+| En celular, la barra de navegación inferior no ocupaba todo el ancho. | Heredaba `justify-self: center` de la regla para tablet; se fijó `justify-self: stretch`. |
+| Al arrastrar el carrusel con el mouse se abría la tarjeta al soltar. | Se registra si hubo movimiento y, en ese caso, se ignora el clic. |
+| Al probar, el puerto 5173 lo estaba usando otro proyecto. | Se levantó River ID en el puerto 5180. |
+
+### Pruebas realizadas
+
+**Con servicios simulados y 7 partidos de ejemplo** (para ver el diseño con datos, sin cargar datos falsos en Firebase):
+
+- [x] Portada: título, cuenta regresiva al próximo partido y tarjeta con fecha, hora y estadio.
+- [x] Carrusel con colores por resultado; tocar una tarjeta abre "Editar partido" con sus datos.
+- [x] Arrastrar el carrusel con el mouse lo desplaza y no abre la tarjeta.
+- [x] Agregar un próximo para mañana a las 18:00: la cuenta regresiva pasa a ese partido (00 días, 21 h, 50 min en el momento de la prueba).
+- [x] Próximos: el partido con fecha pasada muestra el aviso y el resumen "Tenés 1 partido que ya se jugó".
+- [x] Búsqueda "boca": quedan solo los 2 partidos contra Boca Juniors.
+- [x] Estadísticas: 4 asistidos, 2 G · 1 E · 1 P, 50 %; datos curiosos: Boca Juniors (2), Estadio Monumental (3).
+- [x] Celular (375 px): menú abajo a todo el ancho, botón "+" arriba, formulario como panel inferior, sin scroll horizontal.
+
+**Con Firebase real (local, puerto 5180):**
+
+- [x] Estado vacío: cuenta regresiva en "--" y acceso "Agendá tu próximo partido" (abre el formulario con "Próximo" seleccionado).
+- [x] Agregar "PRUEBA V2" el 10/11 a las 21:00: se guarda y, al recargar, la cuenta regresiva y la hora siguen.
+- [x] Eliminar con confirmación: desaparece y, al recargar, vuelve el estado vacío.
+- [x] Consola sin errores.
+- `npm run build` compila (sigue la advertencia de tamaño del SDK de Firebase).
+
+**Pendientes**
+
+- [ ] Publicar la versión 2 en Vercel (unir la rama `version-2` con `main`) y repetir las pruebas en la URL publicada.
+- [ ] Reemplazar los bloques de color por fotos.
+- [ ] Capturas de la versión 2 para comparar con la versión 1.
 
 ## Versión 3 — _(pendiente)_

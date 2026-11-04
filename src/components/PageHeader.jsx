@@ -1,13 +1,17 @@
-// Encabezado de cada pantalla: título, descripción y una acción opcional.
-function PageHeader({ title, subtitle, action }) {
+// Banda oscura con el título de cada pantalla (debajo del Header).
+// "children" permite agregar contenido extra, como la cuenta regresiva.
+function PageHeader({ kicker, title, subtitle, action, children }) {
   return (
-    <header className="page-header">
-      <div>
-        <h1>{title}</h1>
-        {subtitle && <p>{subtitle}</p>}
+    <section className="band band-page">
+      <div className="band-media img-ph" aria-hidden="true" />
+      <div className="band-content">
+        {kicker && <p className="kicker">{kicker}</p>}
+        <h1 className="display page-title">{title}</h1>
+        {subtitle && <p className="band-subtitle">{subtitle}</p>}
+        {action && <div className="band-action">{action}</div>}
       </div>
-      {action}
-    </header>
+      {children}
+    </section>
   )
 }
 

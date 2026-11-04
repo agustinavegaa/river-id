@@ -80,3 +80,63 @@ export function calculateStats(matches) {
     favorites: matches.filter((m) => m.favorite).length,
   }
 }
+
+// ---------- Versión 2 ----------
+
+// Fecha de hoy en formato "AAAA-MM-DD" (hora local).
+export function todayString() {
+  const now = new Date()
+  const month = String(now.getMonth() + 1).padStart(2, '0')
+  const day = String(now.getDate()).padStart(2, '0')
+  return `${now.getFullYear()}-${month}-${day}`
+}
+
+// Arma un Date con la fecha y la hora (opcional) del partido.
+export function getMatchDateTime(match) {
+  const [year, month, day] = match.date.split('-').map(Number)
+  const [hours, minutes] = (match.time || '00:00').split(':').map(Number)
+  return new Date(year, month - 1, day, hours, minutes)
+}
+
+// Un "Próximo" cuya fecha ya pasó: hay que indicar si el usuario fue o no.
+export function isPastUpcoming(match) {
+  return match.status === STATUS.UPCOMING && match.date < todayString()
+}
+
+// El próximo partido que todavía no se jugó (el más cercano en el tiempo).
+export function getNextMatch(matches) {
+  const upcoming = matches.filter((m) => m.status === STATUS.UPCOMING && m.date >= todayString())
+  return sortByDate(upcoming, true)[0] || null
+}
+
+// Días, horas y minutos que faltan hasta una fecha. Nunca devuelve negativos.
+export function getCountdown(target, now = new Date()) {
+  const diff = Math.max(0, target - now)
+  const totalMinutes = Math.floor(diff / 60000)
+  return {
+    days: Math.floor(totalMinutes / 1440),
+    hours: Math.floor((totalMinutes % 1440) / 60),
+    minutes: totalMinutes % 60,
+  }
+}
+
+// Devuelve el valor que más se repite en un campo, con su cantidad.
+function mostCommon(matches, field) {
+  const counts = {}
+  matches.forEach((m) => {
+    const value = (m[field] || '').trim()
+    if (value) counts[value] = (counts[value] || 0) + 1
+  })
+  const [name, count] = Object.entries(counts).sort((a, b) => b[1] - a[1])[0] || []
+  return name ? { name, count } : null
+}
+
+// Datos curiosos: solo con los partidos a los que el usuario asistió.
+export function calculateCuriosities(matches) {
+  const attended = matches.filter((m) => m.status === STATUS.ATTENDED)
+  return {
+    topRival: mostCommon(attended, 'rival'),
+    topStadium: mostCommon(attended, 'stadium'),
+    topCompetition: mostCommon(attended, 'competition'),
+  }
+}
