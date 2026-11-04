@@ -163,7 +163,7 @@ Se subió el código a GitHub (https://github.com/agustinavegaa/river-id), se im
 | 6. Validaciones, carga, éxito/error, responsive | Hecho y probado (con servicios simulados) |
 | 7. Reglas de Firestore | Publicadas; acceso sin login rechazado |
 | Bitácora e informe | En curso (este documento) |
-| Tres iteraciones | Versión 2 de 3 (en rama `version-2`) |
+| Tres iteraciones | Versión 2 de 3, publicada |
 
 ### Capturas
 
@@ -257,6 +257,17 @@ Se agregó un **pie de página** que aclara que es un proyecto universitario no 
 - [x] Escudo en el header y en las tarjetas del carrusel; favicon con el escudo.
 - [x] Fotos en la portada, en las bandas de Mis partidos, Próximos y Estadísticas y en el banner; el texto se lee bien.
 - [x] Celular (375 px): portada con foto, banner con el panel de números en fila, pie de página visible arriba de la barra inferior, sin scroll horizontal.
+
+**Publicación en Vercel (04/11/2026)**
+
+Se unió la rama `version-2` con `main` y se subió a GitHub. Vercel desplegó la nueva versión solo, sin tocar nada en su panel (se comprobó que la página publicada ya pedía el nuevo `favicon.png`). Justo después del despliegue, `escudo-river.png` respondió 404 una vez; segundos después respondió 200, igual que las demás fotos: era el despliegue que todavía se estaba propagando.
+
+En https://river-id-ez6q.vercel.app:
+
+- [x] Escudo, fotos y pie de página visibles; consola sin errores.
+- [x] Agregar "PRUEBA Vercel V2" (10/11, 21:00) desde "Agendá tu próximo partido": se guarda y, al recargar, la cuenta regresiva muestra ese partido.
+- [x] Modificar: en Próximos, "No asistí" → al recargar aparece con estado "No asistí" en Mis partidos.
+- [x] Eliminar con confirmación → al recargar vuelve el estado vacío.
 
 **Pendientes**
 
