@@ -193,8 +193,12 @@ function App() {
       </main>
 
       <footer className="footer">
-        River ID es un proyecto universitario no oficial, hecho por y para hinchas. El escudo y las fotos pertenecen al
-        Club Atlético River Plate y a sus autores.
+        <p>Realizado por Agustina Vega para la materia Desarrollo Frontend II en 2026.</p>
+        <p>
+          River ID es un proyecto universitario no oficial, hecho por y para hinchas. El escudo y las fotos pertenecen
+          al Club Atlético River Plate y a sus autores.
+        </p>
+        <p className="footer-tech">Hecho con React, Firebase y Vercel</p>
       </footer>
 
       {form && (

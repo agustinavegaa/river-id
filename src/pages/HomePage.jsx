@@ -84,15 +84,6 @@ function HomePage({ matches, actions, onNavigate }) {
           />
         )}
 
-        <div className="made-with">
-          <span>Hecho con</span>
-          <div>
-            <span className="brand-pill">React</span>
-            <span className="brand-pill">Firebase</span>
-            <span className="brand-pill">Vercel</span>
-          </div>
-        </div>
-
         <hr className="curve-divider" />
 
         {/* ---------- Sobre la app ---------- */}
