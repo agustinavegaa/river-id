@@ -1,9 +1,14 @@
 // Banda oscura con el título de cada pantalla (debajo del Header).
-// "children" permite agregar contenido extra, como la cuenta regresiva.
-function PageHeader({ kicker, title, subtitle, action, children }) {
+// "image" es la foto de fondo (opcional) y "children" permite agregar
+// contenido extra, como la cuenta regresiva.
+function PageHeader({ kicker, title, subtitle, action, image, children }) {
   return (
     <section className="band band-page">
-      <div className="band-media img-ph" aria-hidden="true" />
+      {image ? (
+        <div className="band-media band-photo" style={{ backgroundImage: `url(${image})` }} aria-hidden="true" />
+      ) : (
+        <div className="band-media img-ph" aria-hidden="true" />
+      )}
       <div className="band-content">
         {kicker && <p className="kicker">{kicker}</p>}
         <h1 className="display page-title">{title}</h1>

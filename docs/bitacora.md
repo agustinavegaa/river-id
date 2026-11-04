@@ -191,7 +191,19 @@ _(Agregar capturas de: Inicio vacío, formulario con errores, Mis partidos, Pró
 
 En la referencia el color de acento era verde lima; se reemplazó por el **rojo River (#9E182B)**. Negro #171717, blanco y gris claro siguen como base.
 
-Los lugares donde irán fotos (portada, banner, tarjetas del carrusel) quedaron como **bloques de color** con la clase `img-ph`, para reemplazarlos por imágenes en una próxima versión. Las tarjetas del carrusel cambian de color según el resultado: rojo (victoria), gris (empate), negro (derrota).
+Primero, los lugares de las fotos quedaron como **bloques de color** (clase `img-ph`). Después se agregaron las imágenes:
+
+| Lugar | Imagen (`public/images/`) |
+| --- | --- |
+| Logo y favicon | Escudo de River (`escudo-river.png`, reducido a 240 px de alto; favicon de 64 px) |
+| Portada del Inicio y pantalla de carga | El Monumental de noche (`monumental-noche.webp`) |
+| Banner "Tu récord en la cancha" y Estadísticas | Jugadores festejando (`festejo-jugadores.webp`) |
+| Mis partidos | Hinchada con camisetas (`hinchada-camisetas.webp`) |
+| Próximos | Hinchada con banderas (`hinchada-banderas.webp`) |
+
+Las fotos tienen una capa oscura encima para que el texto blanco se lea. Las tarjetas del carrusel siguen en color (rojo victoria, gris empate, negro derrota) porque así el resultado se reconoce de un vistazo.
+
+Se agregó un **pie de página** que aclara que es un proyecto universitario no oficial y que el escudo y las fotos pertenecen al club y a sus autores.
 
 **Funcionalidades nuevas**
 
@@ -206,7 +218,8 @@ Los lugares donde irán fotos (portada, banner, tarjetas del carrusel) quedaron 
 ### Herramientas de IA y prompt
 
 - **Claude (Claude Code, app de escritorio)**.
-- Prompt: se adjuntó una imagen de referencia (landing "Athlete Showcase") con el pedido: *"tomá de referencia el diseño, mantené los colores de River: rojo, blanco y gris/negro… las imágenes las agregamos después, dejalos en color y seguí con el plan de mejoras"*.
+- Prompt 2: se adjuntaron el escudo y cuatro fotos con el pedido *"te adjunto como logo: escudo de river y algunas imagenes para usar y despues publicala"*.
+- Prompt 1: se adjuntó una imagen de referencia (landing "Athlete Showcase") con el pedido: *"tomá de referencia el diseño, mantené los colores de River: rojo, blanco y gris/negro… las imágenes las agregamos después, dejalos en color y seguí con el plan de mejoras"*.
 
 ### Dificultades y cómo se resolvieron
 
@@ -239,10 +252,14 @@ Los lugares donde irán fotos (portada, banner, tarjetas del carrusel) quedaron 
 - [x] Consola sin errores.
 - `npm run build` compila (sigue la advertencia de tamaño del SDK de Firebase).
 
+**Con las fotos (servicios simulados):**
+
+- [x] Escudo en el header y en las tarjetas del carrusel; favicon con el escudo.
+- [x] Fotos en la portada, en las bandas de Mis partidos, Próximos y Estadísticas y en el banner; el texto se lee bien.
+- [x] Celular (375 px): portada con foto, banner con el panel de números en fila, pie de página visible arriba de la barra inferior, sin scroll horizontal.
+
 **Pendientes**
 
-- [ ] Publicar la versión 2 en Vercel (unir la rama `version-2` con `main`) y repetir las pruebas en la URL publicada.
-- [ ] Reemplazar los bloques de color por fotos.
 - [ ] Capturas de la versión 2 para comparar con la versión 1.
 
 ## Versión 3 — _(pendiente)_

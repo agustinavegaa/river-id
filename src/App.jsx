@@ -171,7 +171,7 @@ function App() {
       <main className="main">
         {loading || loadError ? (
           <>
-            <PageHeader kicker="Mi vida como hincha" title="River ID" />
+            <PageHeader kicker="Mi vida como hincha" title="River ID" image="/images/monumental-noche.webp" />
             <div className="sheet">
               {loading ? (
                 <Loader text="Cargando tu historial de hincha..." />
@@ -191,6 +191,11 @@ function App() {
           renderPage()
         )}
       </main>
+
+      <footer className="footer">
+        River ID es un proyecto universitario no oficial, hecho por y para hinchas. El escudo y las fotos pertenecen al
+        Club Atlético River Plate y a sus autores.
+      </footer>
 
       {form && (
         <MatchForm match={form.match} defaults={form.defaults} onSave={handleSave} onClose={() => setForm(null)} />

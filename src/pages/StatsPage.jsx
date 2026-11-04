@@ -14,6 +14,7 @@ function StatsPage({ matches }) {
     <>
       <PageHeader
         kicker="Récord personal"
+        image="/images/festejo-jugadores.webp"
         title="Mis estadísticas"
         subtitle="Calculadas con los partidos a los que fuiste."
       />

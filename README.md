@@ -13,6 +13,8 @@ Aplicación web para hinchas de River Plate: un **diario digital del hincha** do
 - [Firebase](https://firebase.google.com/): Cloud Firestore (base de datos) y Authentication anónima
 - [Lucide React](https://lucide.dev/) (íconos)
 - Google Fonts: Anton (títulos) e Inter (textos)
+
+El escudo y las fotos de `public/images/` pertenecen al Club Atlético River Plate y a sus autores; se usan solo con fines educativos.
 - Vercel (despliegue)
 
 ## Funcionalidades (versión 2)

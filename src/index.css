@@ -361,8 +361,25 @@ code {
 }
 
 .band-media {
-  width: 45%;
-  opacity: 0.85;
+  width: 50%;
+}
+
+/* Fotos de fondo */
+.hero-media {
+  background: url('/images/monumental-noche.webp') center / cover;
+}
+
+.band-photo {
+  background-size: cover;
+  background-position: center;
+}
+
+/* Capa oscura sobre la foto para que el texto se lea bien */
+.band-photo::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(23, 23, 23, 0.35);
 }
 
 .band-home {
@@ -754,7 +771,9 @@ code {
 .promo-media {
   position: absolute;
   inset: 0;
-  background: linear-gradient(115deg, #171717 0%, #2b2b2b 45%, #5e0f1b 100%);
+  background:
+    linear-gradient(90deg, rgba(23, 23, 23, 0.92) 0%, rgba(23, 23, 23, 0.55) 55%, rgba(23, 23, 23, 0.2) 100%),
+    url('/images/festejo-jugadores.webp') center / cover;
 }
 
 .promo-content {
@@ -1305,6 +1324,19 @@ code {
   margin: 0;
 }
 
+.footer {
+  padding: 24px var(--gutter) 32px;
+  border-top: 1px solid var(--gray-light);
+  font-size: 0.78rem;
+  color: var(--gray-text);
+  text-align: center;
+}
+
+.logo {
+  display: block;
+  object-fit: contain;
+}
+
 .setup-screen {
   max-width: 520px;
   margin: 15vh auto;
@@ -1659,7 +1691,11 @@ code {
 
   .hero-media {
     width: 100%;
-    opacity: 0.6;
+    opacity: 0.5;
+  }
+
+  .footer {
+    padding-bottom: 100px;
   }
 
   .hero-title {
@@ -1696,7 +1732,7 @@ code {
   .sheet {
     margin-top: -28px;
     border-radius: 24px 24px 0 0;
-    padding: 40px var(--gutter) 110px;
+    padding: 40px var(--gutter) 48px;
     gap: 32px;
   }
 

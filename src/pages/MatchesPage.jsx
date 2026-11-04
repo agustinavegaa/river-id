@@ -28,6 +28,7 @@ function MatchesPage({ matches, actions, busyId }) {
     <>
       <PageHeader
         kicker="Historial"
+        image="/images/hinchada-camisetas.webp"
         title="Mis partidos"
         subtitle="Tu historia completa como hincha, partido por partido."
         action={

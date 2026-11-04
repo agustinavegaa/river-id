@@ -19,6 +19,7 @@ function UpcomingPage({ matches, actions, busyId }) {
     <>
       <PageHeader
         kicker="Agenda"
+        image="/images/hinchada-banderas.webp"
         title="Próximos partidos"
         subtitle={
           nextMatch ? `Lo que falta para River vs ${nextMatch.rival}.` : 'Organizá los partidos a los que pensás ir.'

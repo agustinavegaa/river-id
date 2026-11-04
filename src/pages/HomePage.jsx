@@ -14,7 +14,7 @@ function HomePage({ matches, actions, onNavigate }) {
     <>
       {/* ---------- Portada oscura ---------- */}
       <section className="band band-home">
-        <div className="hero-media img-ph" aria-hidden="true" />
+        <div className="hero-media" aria-hidden="true" />
 
         <div className="band-content">
           <p className="kicker">Mi vida como hincha</p>
@@ -118,7 +118,7 @@ function HomePage({ matches, actions, onNavigate }) {
 
         {/* ---------- Banner con números ---------- */}
         <section className="promo">
-          <div className="promo-media img-ph" aria-hidden="true" />
+          <div className="promo-media" aria-hidden="true" />
           <div className="promo-content">
             <h2 className="display promo-title">
               Tu récord
