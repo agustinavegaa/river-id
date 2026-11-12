@@ -1,8 +1,6 @@
 import { Star } from 'lucide-react'
 import Logo from './Logo'
-import { formatDate, getOutcome, hasResult } from '../utils/matchUtils'
-
-const OUTCOME_LABELS = { victoria: 'Victoria', empate: 'Empate', derrota: 'Derrota' }
+import { OUTCOME_LABELS, formatDate, getOutcome, hasResult } from '../utils/matchUtils'
 
 // Tarjeta vertical para el carrusel del inicio. Al tocarla se edita el partido.
 // La parte de arriba es un bloque de color que más adelante será una foto.

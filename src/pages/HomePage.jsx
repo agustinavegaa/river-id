@@ -1,14 +1,18 @@
-import { ArrowRight, MapPin, Plus, Ticket } from 'lucide-react'
+import { ArrowRight, BarChart3, CalendarClock, MapPin, Plus, Ticket } from 'lucide-react'
 import Carousel from '../components/Carousel'
 import Countdown from '../components/Countdown'
 import EmptyState from '../components/EmptyState'
-import { STATUS, calculateStats, formatDate, getMatchDateTime, getNextMatch, sortByDate } from '../utils/matchUtils'
+import { STATUS, calculateStats, formatDate, formatTime, getNextMatch, isPastUpcoming, sortByDate } from '../utils/matchUtils'
 
 function HomePage({ matches, actions, onNavigate }) {
   const stats = calculateStats(matches)
   const nextMatch = getNextMatch(matches)
-  // En el carrusel: los últimos partidos jugados (sin los próximos).
-  const latest = sortByDate(matches.filter((m) => m.status !== STATUS.UPCOMING)).slice(0, 8)
+  // Próximos: los que todavía no se jugaron y los que falta confirmar si fue.
+  const upcoming = matches.filter((m) => m.status === STATUS.UPCOMING)
+  const toConfirm = upcoming.filter(isPastUpcoming).length
+  const comingUp = upcoming.length - toConfirm
+  // En el carrusel: los últimos partidos a los que el usuario fue.
+  const latest = sortByDate(matches.filter((m) => m.status === STATUS.ATTENDED)).slice(0, 8)
 
   return (
     <>
@@ -25,7 +29,7 @@ function HomePage({ matches, actions, onNavigate }) {
         </div>
 
         <div className="hero-bottom">
-          <Countdown target={nextMatch ? getMatchDateTime(nextMatch) : null} />
+          <Countdown match={nextMatch} />
 
           <p className="hero-copy">
             {nextMatch
@@ -40,8 +44,7 @@ function HomePage({ matches, actions, onNavigate }) {
               </span>
               <span className="next-card-text">
                 <strong>
-                  {formatDate(nextMatch.date)}
-                  {nextMatch.time && ` · ${nextMatch.time} h`}
+                  {formatDate(nextMatch.date)} · {formatTime(nextMatch)}
                 </strong>
                 <small>{nextMatch.stadium || nextMatch.competition || 'Próximo partido'}</small>
               </span>
@@ -64,9 +67,39 @@ function HomePage({ matches, actions, onNavigate }) {
       <div className="sheet">
         <span className="sheet-notch">deslizá</span>
 
+        {/* ---------- Accesos rápidos ---------- */}
+        <nav className="quick-actions" aria-label="Accesos rápidos">
+          <button className="quick-action quick-action-primary" onClick={() => actions.onAdd()}>
+            <Plus size={22} />
+            <strong>Agregar partido</strong>
+            <span>Sumá uno a tu historia</span>
+          </button>
+          <button className="quick-action" onClick={() => onNavigate('proximos')}>
+            <CalendarClock size={22} />
+            <strong>Próximos</strong>
+            <span>
+              {upcoming.length === 0
+                ? 'No tenés partidos agendados'
+                : [
+                    comingUp > 0 && `${comingUp} por venir`,
+                    toConfirm > 0 && `${toConfirm} por confirmar si fuiste`,
+                  ]
+                    .filter(Boolean)
+                    .join(' · ')}
+            </span>
+          </button>
+          <button className="quick-action" onClick={() => onNavigate('estadisticas')}>
+            <BarChart3 size={22} />
+            <strong>Estadísticas</strong>
+            <span>
+              {stats.withResult > 0 ? `${stats.winRate}% de victorias con vos` : 'Tu récord en la cancha'}
+            </span>
+          </button>
+        </nav>
+
         <section className="section-center">
           <h2 className="display section-title">Últimos partidos</h2>
-          <p>Los partidos que fuiste sumando a tu historia. Tocá una tarjeta para editarla.</p>
+          <p>Los partidos que viviste en la cancha. Tocá una tarjeta para editarla.</p>
         </section>
 
         {latest.length > 0 ? (
@@ -74,11 +107,15 @@ function HomePage({ matches, actions, onNavigate }) {
         ) : (
           <EmptyState
             icon={Ticket}
-            title="Todavía no registraste partidos"
-            message="Empezá tu diario de hincha agregando el primer partido al que fuiste."
+            title={matches.length === 0 ? 'Todavía no registraste partidos' : 'Todavía no marcaste partidos como “Asistí”'}
+            message={
+              matches.length === 0
+                ? 'Empezá tu diario de hincha agregando el primer partido al que fuiste.'
+                : 'Acá van a aparecer los partidos a los que fuiste. Agregá uno o marcá tu asistencia en Próximos.'
+            }
             action={
               <button className="btn btn-primary" onClick={() => actions.onAdd()}>
-                <Plus size={18} /> Agregar mi primer partido
+                <Plus size={18} /> Agregar partido
               </button>
             }
           />

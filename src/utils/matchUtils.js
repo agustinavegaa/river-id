@@ -6,6 +6,8 @@ export const STATUS = {
   NOT_ATTENDED: 'no_asisti',
 }
 
+export const OUTCOME_LABELS = { victoria: 'Victoria', empate: 'Empate', derrota: 'Derrota' }
+
 export const STATUS_LABELS = {
   proximo: 'Próximo',
   asisti: 'Asistí',
@@ -51,10 +53,15 @@ export function formatDate(dateString) {
   })
 }
 
-// Ordena por fecha: los más recientes primero (o al revés con ascending).
+// Clave para ordenar por fecha y hora. Sin hora, el partido va al final de su día.
+function dateTimeKey(match) {
+  return `${match.date} ${match.time || '24:00'}`
+}
+
+// Ordena por fecha y hora: los más recientes primero (o al revés con ascending).
 export function sortByDate(matches, ascending = false) {
   return [...matches].sort((a, b) =>
-    ascending ? a.date.localeCompare(b.date) : b.date.localeCompare(a.date)
+    ascending ? dateTimeKey(a).localeCompare(dateTimeKey(b)) : dateTimeKey(b).localeCompare(dateTimeKey(a))
   )
 }
 
@@ -72,6 +79,8 @@ export function calculateStats(matches) {
     total: matches.length,
     attended: attended.length,
     withResult: withResult.length,
+    // Partidos a los que fue pero sin resultado cargado: no cuentan para V/E/D.
+    attendedWithoutResult: attended.length - withResult.length,
     upcoming: matches.filter((m) => m.status === STATUS.UPCOMING).length,
     wins,
     draws,
@@ -91,22 +100,50 @@ export function todayString() {
   return `${now.getFullYear()}-${month}-${day}`
 }
 
-// Arma un Date con la fecha y la hora (opcional) del partido.
+// Arma un Date con la fecha y la hora del partido.
+// Solo se usa cuando el partido tiene hora: nunca inventamos una.
 export function getMatchDateTime(match) {
   const [year, month, day] = match.date.split('-').map(Number)
-  const [hours, minutes] = (match.time || '00:00').split(':').map(Number)
+  const [hours, minutes] = match.time.split(':').map(Number)
   return new Date(year, month - 1, day, hours, minutes)
 }
 
-// Un "Próximo" cuya fecha ya pasó: hay que indicar si el usuario fue o no.
+// Días de calendario que faltan hasta la fecha del partido (0 = hoy).
+export function daysUntil(dateString) {
+  const [year, month, day] = dateString.split('-').map(Number)
+  const today = new Date()
+  const start = new Date(today.getFullYear(), today.getMonth(), today.getDate())
+  return Math.round((new Date(year, month - 1, day) - start) / 86400000)
+}
+
+// ¿El partido ya se jugó? Si es hoy y tiene hora, comparamos con la hora actual.
+// Si es hoy y no tiene hora, todavía no lo damos por jugado.
+export function hasBeenPlayed(match) {
+  const today = todayString()
+  if (match.date < today) return true
+  if (match.date > today) return false
+  return Boolean(match.time) && getMatchDateTime(match) < new Date()
+}
+
+// ¿Ya se puede marcar si fue? Desde el día del partido en adelante.
+export function canMarkAttendance(match) {
+  return match.date <= todayString()
+}
+
+// Un "Próximo" que ya se jugó: hay que indicar si el usuario fue o no.
 export function isPastUpcoming(match) {
-  return match.status === STATUS.UPCOMING && match.date < todayString()
+  return match.status === STATUS.UPCOMING && hasBeenPlayed(match)
 }
 
 // El próximo partido que todavía no se jugó (el más cercano en el tiempo).
 export function getNextMatch(matches) {
-  const upcoming = matches.filter((m) => m.status === STATUS.UPCOMING && m.date >= todayString())
+  const upcoming = matches.filter((m) => m.status === STATUS.UPCOMING && !hasBeenPlayed(m))
   return sortByDate(upcoming, true)[0] || null
+}
+
+// Texto de la hora para mostrar: si no hay, no inventamos una.
+export function formatTime(match) {
+  return match.time ? `${match.time} h` : 'Hora a confirmar'
 }
 
 // Días, horas y minutos que faltan hasta una fecha. Nunca devuelve negativos.
@@ -120,15 +157,18 @@ export function getCountdown(target, now = new Date()) {
   }
 }
 
-// Devuelve el valor que más se repite en un campo, con su cantidad.
+// Devuelve el o los valores que más se repiten en un campo, con su cantidad.
+// Si hay empate, devuelve todos los empatados (no elegimos uno al azar).
 function mostCommon(matches, field) {
   const counts = {}
   matches.forEach((m) => {
     const value = (m[field] || '').trim()
     if (value) counts[value] = (counts[value] || 0) + 1
   })
-  const [name, count] = Object.entries(counts).sort((a, b) => b[1] - a[1])[0] || []
-  return name ? { name, count } : null
+  const max = Math.max(0, ...Object.values(counts))
+  if (max === 0) return null
+  const names = Object.keys(counts).filter((name) => counts[name] === max)
+  return { names, count: max }
 }
 
 // Datos curiosos: solo con los partidos a los que el usuario asistió.

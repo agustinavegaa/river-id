@@ -17,12 +17,13 @@ Aplicación web para hinchas de River Plate: un **diario digital del hincha** do
 El escudo y las fotos de `public/images/` pertenecen al Club Atlético River Plate y a sus autores; se usan solo con fines educativos.
 - Vercel (despliegue)
 
-## Funcionalidades (versión 2)
+## Funcionalidades (versión 3)
 
-- **Inicio:** portada con cuenta regresiva al próximo partido, carrusel de últimos partidos, sección "Sobre River ID" y banner con tu récord.
-- **Mis partidos:** agregar, consultar, editar y eliminar partidos; marcar favoritos; comentario personal; búsqueda por rival y filtros por estado.
-- **Próximos:** partidos con estado "Próximo", con cuenta regresiva y aviso cuando un partido ya se jugó; se pueden marcar como "Asistí" o "No asistí".
-- **Estadísticas:** porcentaje de victorias, partidos asistidos, victorias, empates, derrotas, favoritos y datos curiosos (rival, estadio y competición más vistos).
+- **Inicio:** portada con cuenta regresiva al próximo partido (si no tiene hora, solo los días), accesos rápidos, carrusel de partidos a los que fuiste, sección "Sobre River ID" y banner con tu récord.
+- **Mis partidos:** agregar, consultar, editar y eliminar partidos; favoritos; comentario personal; búsqueda por rival; filtros por estado, resultado y competición; orden por fecha.
+- **Próximos:** "¿Fuiste?" (partidos ya jugados) y "Se vienen" (en orden de fecha y hora); "Asistí" abre el formulario para cargar el resultado.
+- **Estadísticas:** porcentaje de victorias, gráfico de resultados, partidos asistidos, victorias, empates, derrotas, favoritos y datos curiosos.
+- **Formulario:** validaciones con mensajes específicos, aviso de duplicados y bloqueo de doble envío.
 
 ## Instalación y ejecución local
 

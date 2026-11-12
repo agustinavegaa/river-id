@@ -163,7 +163,7 @@ Se subió el código a GitHub (https://github.com/agustinavegaa/river-id), se im
 | 6. Validaciones, carga, éxito/error, responsive | Hecho y probado (con servicios simulados) |
 | 7. Reglas de Firestore | Publicadas; acceso sin login rechazado |
 | Bitácora e informe | En curso (este documento) |
-| Tres iteraciones | Versión 2 de 3, publicada |
+| Iteraciones | V1 y V2 publicadas; V3 lista en rama `version-3` |
 
 ### Capturas
 
@@ -204,6 +204,8 @@ Primero, los lugares de las fotos quedaron como **bloques de color** (clase `img
 Las fotos tienen una capa oscura encima para que el texto blanco se lea. Las tarjetas del carrusel siguen en color (rojo victoria, gris empate, negro derrota) porque así el resultado se reconoce de un vistazo.
 
 Se agregó un **pie de página** que aclara que es un proyecto universitario no oficial y que el escudo y las fotos pertenecen al club y a sus autores.
+
+Después se sacó del Inicio el bloque "Hecho con" (React, Firebase y Vercel) y se lo pasó al pie en letra pequeña, junto con la autoría: "Realizado por Agustina Vega para la materia Desarrollo Frontend II en 2026". Se publicó y se comprobó en la URL de Vercel.
 
 **Funcionalidades nuevas**
 
@@ -273,4 +275,120 @@ En https://river-id-ez6q.vercel.app:
 
 - [ ] Capturas de la versión 2 para comparar con la versión 1.
 
-## Versión 3 — _(pendiente)_
+## Versión 3 — Optimización UX/UI y funcional
+
+**Fecha:** 12/11/2026 · **Rama:** `version-3`
+
+Objetivo: una versión funcionalmente sólida y consistente, que sirva de base para la Versión 4 (interacciones y animaciones). Se mantuvo la identidad visual de V2: no se agregaron animaciones ni transiciones.
+
+### Metodología
+
+1. Se analizó el código y se probó la V2 con 9 partidos de ejemplo en 320, 820 y 1280 px.
+2. Se listaron los problemas encontrados y una propuesta separada en imprescindibles (1 a 12) y opcionales (13 a 15).
+3. Se aprobaron las imprescindibles + 13 y 14. La 15 (reglas de Firestore más estrictas) quedó afuera: **las reglas no se modificaron**.
+
+### Problemas encontrados en V2 (al probar)
+
+| # | Problema |
+| --- | --- |
+| A | Un partido sin hora mostraba la cuenta regresiva a la medianoche ("00:00:00" si era hoy): se inventaba una hora. |
+| B | Los botones "Asistí / No asistí" aparecían también en partidos que todavía no se jugaron. |
+| C | En tablet (≈ 770–960 px) el botón "+" del encabezado se caía debajo del logo. |
+| D | El formulario permitía guardar un "Próximo" con resultado o un "Asistí" con fecha futura. |
+| E | El carrusel "partidos que fuiste sumando" incluía partidos "No asistí" (con color de victoria). |
+| F | Si había empate en un dato curioso, se mostraba uno solo, elegido al azar. |
+| G | Los próximos se ordenaban por fecha pero no por hora. |
+| H | Todos los errores de Firebase mostraban el mismo mensaje genérico. |
+
+### Mejoras realizadas y motivos
+
+| Mejora | Motivo UX/UI |
+| --- | --- |
+| **Cuenta regresiva honesta**: sin hora muestra solo los días (o "HOY") y "Hora a confirmar". | No mostrar información inventada. (A) |
+| **Orden por fecha y hora** en todas las listas; sin hora va al final de su día. | Orden cronológico real. (G) |
+| **Próximos en dos grupos**: "¿Fuiste?" (ya jugados) y "Se vienen" (en orden). Los botones de asistencia aparecen recién desde el día del partido. | Lo que necesita una acción va primero; no se puede marcar asistencia a un partido futuro. (B) |
+| **"Asistí" abre el formulario** con título "¿Cómo salió?" para cargar el resultado; "No asistí" se guarda directo. | Un solo paso para completar el partido y que cuente en estadísticas. |
+| **Formulario en secciones**: Datos del partido / Estado y resultado / Tu recuerdo, con "* Campos obligatorios". | Agrupar reduce la carga visual y aclara qué es obligatorio. |
+| Si el estado es "Próximo", **el resultado se oculta** y se guarda vacío. | Un partido futuro no tiene resultado. (D) |
+| **Validaciones nuevas** con mensajes específicos: fecha futura con "Asistí/No asistí", goles de 0 a 30, rival de hasta 40 caracteres, falta uno de los goles. | Errores claros junto al campo. (D) |
+| **Aviso de duplicado**: mismo rival y misma fecha (sin importar mayúsculas, acentos ni espacios). | Evita registros repetidos. |
+| **Bloqueo de doble envío** (además del botón deshabilitado) y **cursor al primer campo con error**. | Evita duplicados por apretar dos veces; ayuda a corregir rápido. |
+| **Esc** cierra el formulario y la confirmación. | Atajo esperado en una ventana modal. |
+| **Mis partidos**: filtros por resultado y competición (solo las que usaste), orden por fecha, "Limpiar filtros", contador "Mostrando X de Y" y estado vacío "No encontramos partidos". Todos los filtros se combinan con la búsqueda. | Encontrar un partido rápido aunque el historial crezca. |
+| **Inicio**: accesos rápidos (Agregar partido, Próximos con "X por venir · Y por confirmar", Estadísticas con el %). Carrusel solo con partidos "Asistí". | Las tres acciones principales al alcance; el carrusel muestra lo que dice su título. (E) |
+| **Estadísticas**: bloque rojo con % + **gráfico de anillo** (solo CSS, sin librerías) con victorias, empates y derrotas y su porcentaje; aviso de partidos asistidos sin resultado; empates en datos curiosos ("Empate: A, B"); "Competición más frecuente". | Lectura visual inmediata; datos honestos. (F) |
+| **Mensajes de error según la causa**: sin conexión, sin permiso, acceso anónimo deshabilitado. Si el navegador sabe que no hay internet, avisa enseguida en vez de quedar "Guardando...". Pantalla de error de carga con título y "Reintentar". | El usuario sabe qué pasó y qué hacer. (H) |
+| **Responsive**: encabezado en una fila en tablet; filtros en dos filas desde 1100 px; accesos rápidos en lista en celular; nombres largos del carrusel cortados en 2 líneas. | Sin desbordes ni textos cortados. (C) |
+
+### Componentes y archivos modificados
+
+- Nuevos: `src/components/ResultsChart.jsx` (gráfico de anillo), `src/utils/errors.js` (mensajes de error).
+- Modificados: `MatchForm.jsx`, `Countdown.jsx`, `MatchCard.jsx`, `MatchTile.jsx`, `Modal.jsx`, `HomePage.jsx`, `MatchesPage.jsx`, `UpcomingPage.jsx`, `StatsPage.jsx`, `App.jsx`, `utils/matchUtils.js`, `index.css`.
+- **Sin cambios**: estructura de datos en Firestore (mismos campos), `matchesService.js`, `firebase/config.js` y `firestore.rules`.
+
+### Dificultades y soluciones
+
+| Dificultad | Solución |
+| --- | --- |
+| La carpeta temporal con los servicios simulados para pruebas se había borrado. | Se volvió a crear, agregando casos límite: rival con nombre largo y un partido de hoy sin hora. |
+| Definir cuándo un partido "ya se jugó" si no tiene hora. | Si es hoy y no tiene hora, no se da por jugado (sigue en la cuenta regresiva), pero ya se pueden mostrar los botones de asistencia porque es el día del partido. |
+| El selector de competiciones ordenaba "Copa de la Liga" después de "Copa Sudamericana". | Se ordenó con `localeCompare(..., 'es')`. |
+| En pantallas de ≈ 800–1100 px se cortaba "Todas las competiciones" en el selector. | Desde 1100 px la búsqueda pasa a su propia fila y los tres selectores quedan en otra. |
+| En la vista de tablet los tres selectores quedaban en 2 + 1. | Se pusieron en 3 columnas. |
+| Algunas capturas de la herramienta de prueba salían desactualizadas (por ejemplo, el menú marcando otra sección). | Se verificó el estado real leyendo la página (DOM) antes de sacar conclusiones. |
+
+### Pruebas realizadas
+
+**Funciones de cálculo (con Node, 13 comprobaciones, todas OK):** partido de hoy sin hora no se da por jugado; con hora pasada sí; días hasta el partido; "Hora a confirmar"; orden 18:00 → 21:00 → sin hora; el próximo partido ignora el ya jugado; empate en dato curioso devuelve ambos; estadio vacío no inventa datos; asistidos/con resultado/sin resultado/porcentaje; la cuenta regresiva nunca es negativa.
+
+**Con servicios simulados (9 partidos de ejemplo):**
+
+- [x] Inicio: partido de hoy sin hora → "HOY · Hora a confirmar". Carrusel sin el partido "No asistí". Accesos rápidos: "2 por venir · 1 por confirmar si fuiste", "40% de victorias con vos".
+- [x] Próximos: Independiente (ya jugado) en "¿Fuiste?"; San Lorenzo (futuro) sin botones; Rosario Central (hoy) con botones.
+- [x] "Asistí" → formulario "¿Cómo salió?"; goles 45 → "Revisá los goles: el máximo es 30."; un solo gol → "Completá los goles de ambos equipos…"; el cursor va al campo con error; al guardar 2–0 pasa a "Asistí" y sale de "¿Fuiste?".
+- [x] Duplicado "  san  lorenzo " en la misma fecha → "Ya registraste River vs San Lorenzo el dom, 15 nov 2026."; fecha futura con "Asistí" → "Este partido todavía no se jugó: marcalo como “Próximo”."
+- [x] "Próximo": el resultado se oculta. Tres envíos seguidos → **1 solo** partido guardado, con goles `null`.
+- [x] Errores: "No tenés permiso…" y "No hay conexión con el servidor…" según la causa; error de carga con "Reintentar" que recupera la lista.
+- [x] Esc cierra el formulario.
+- [x] Mis partidos: Empates → 2; + Liga Profesional → 1; + búsqueda "xyz" → "No encontramos partidos"; "Limpiar filtros" vuelve a 10 de 10; orden "Más antiguos primero" correcto.
+- [x] Estadísticas: 50 % (3 de 6), anillo y leyenda 3/2/1 (50/33/17 %), datos curiosos correctos.
+- [x] Responsive: sin scroll horizontal en 320, 820 y 1024 px; encabezado en una fila en 820 px; el último texto queda por encima del menú inferior en celular; formulario usable en 320 px.
+
+**Con Firebase real (local):**
+
+- [x] Agendar "PRUEBA V3" para hoy sin hora con dos envíos seguidos → 1 solo registro; al recargar: "HOY · Hora a confirmar" y "1 por venir".
+- [x] "Asistí" → "¿Cómo salió?" → 1–0 → al recargar: carrusel con la victoria, banner 01/01/100 % y Estadísticas 100 %.
+- [x] Favorito → al recargar sigue marcado.
+- [x] Eliminar con confirmación → al recargar vuelve el estado vacío. Consola sin errores.
+- [x] Lectura sin login a Firestore: sigue rechazada (403). Reglas sin cambios.
+- `npm run build` compila (sigue la advertencia de tamaño del SDK de Firebase).
+
+### Comparación V2 → V3
+
+| Aspecto | V2 | V3 |
+| --- | --- | --- |
+| Cuenta regresiva sin hora | Contaba hasta la medianoche | Solo días o "HOY" + "Hora a confirmar" |
+| Próximos | Una sola lista, botones en todos | "¿Fuiste?" y "Se vienen"; botones solo desde el día del partido |
+| Marcar "Asistí" | Cambiaba el estado sin resultado | Abre "¿Cómo salió?" para cargar el resultado |
+| Formulario | Lista de campos | 3 secciones, obligatorios marcados, resultado oculto en "Próximo" |
+| Validaciones | Rival, fecha, goles enteros | + fecha futura, máximos, duplicados, doble envío, foco al error |
+| Mis partidos | Búsqueda + estado | + resultado, competición, orden, limpiar, contador, vacío de búsqueda |
+| Inicio | Carrusel con todos los jugados | Accesos rápidos + carrusel solo "Asistí" |
+| Estadísticas | % con barra | % + gráfico de anillo con leyenda, aviso de partidos sin resultado, empates |
+| Errores | Mensaje genérico | Según la causa |
+| Tablet | "+" se caía de línea | Encabezado en una fila |
+
+### Capturas recomendadas como evidencia
+
+1. Inicio con "HOY · Hora a confirmar" y los accesos rápidos (escritorio y celular).
+2. Próximos con los grupos "¿Fuiste?" y "Se vienen".
+3. Formulario "¿Cómo salió?" y formulario con errores (duplicado y fecha futura).
+4. Mis partidos con filtros combinados y "Mostrando X de Y"; estado "No encontramos partidos".
+5. Estadísticas con el gráfico de anillo.
+6. Encabezado en tablet: antes (V2, el "+" abajo) y después (V3).
+7. Firestore → Datos con un partido guardado.
+
+### Pendiente
+
+- [ ] Publicar la V3 en Vercel (unir `version-3` con `main`) y repetir la prueba en la URL publicada.
+- [ ] Versión 4: interacciones, animaciones y microinteracciones.

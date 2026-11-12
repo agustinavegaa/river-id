@@ -1,9 +1,13 @@
 import { useEffect, useState } from 'react'
-import { getCountdown } from '../utils/matchUtils'
+import { daysUntil, getCountdown, getMatchDateTime } from '../utils/matchUtils'
 
-// Cuenta regresiva (días, horas y minutos) hasta la fecha "target".
-// Se actualiza sola cada 30 segundos.
-function Countdown({ target }) {
+const pad = (n) => String(n).padStart(2, '0')
+
+// Cuenta regresiva al partido "match".
+// - Con hora: días, horas y minutos (se actualiza cada 30 segundos).
+// - Sin hora: solo los días que faltan y "Hora a confirmar". No inventamos una hora.
+// - Sin partido: guiones.
+function Countdown({ match }) {
   const [now, setNow] = useState(() => new Date())
 
   useEffect(() => {
@@ -11,8 +15,24 @@ function Countdown({ target }) {
     return () => clearInterval(timer)
   }, [])
 
-  const { days, hours, minutes } = target ? getCountdown(target, now) : {}
-  const format = (n) => (target ? String(n).padStart(2, '0') : '--')
+  if (match && !match.time) {
+    const days = daysUntil(match.date)
+    return (
+      <div className="countdown glass" aria-label="Días que faltan para el próximo partido">
+        <div>
+          <strong>{days === 0 ? 'HOY' : pad(days)}</strong>
+          <span>{days === 0 ? 'Es hoy' : days === 1 ? 'Día' : 'Días'}</span>
+        </div>
+        <div>
+          <strong>--:--</strong>
+          <span>Hora a confirmar</span>
+        </div>
+      </div>
+    )
+  }
+
+  const { days, hours, minutes } = match ? getCountdown(getMatchDateTime(match), now) : {}
+  const format = (n) => (match ? pad(n) : '--')
 
   return (
     <div className="countdown glass" aria-label="Cuenta regresiva al próximo partido">

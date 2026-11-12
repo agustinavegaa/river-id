@@ -13,7 +13,8 @@ import StatsPage from './pages/StatsPage'
 import UpcomingPage from './pages/UpcomingPage'
 import { listenToUser } from './services/authService'
 import { addMatch, deleteMatch, getMatches, updateMatch } from './services/matchesService'
-import { STATUS_LABELS } from './utils/matchUtils'
+import { getErrorMessage, offlineError } from './utils/errors'
+import { STATUS, STATUS_LABELS } from './utils/matchUtils'
 
 function App() {
   const [user, setUser] = useState(null)
@@ -36,7 +37,7 @@ function App() {
       (firebaseUser) => setUser(firebaseUser),
       (error) => {
         console.error(error)
-        setLoadError('No se pudo iniciar sesión. Revisá que el acceso anónimo esté habilitado en Firebase.')
+        setLoadError(getErrorMessage(error, 'No se pudo iniciar sesión. Recargá la página para intentar de nuevo.'))
         setLoading(false)
       }
     )
@@ -67,7 +68,7 @@ function App() {
       setLoadError('')
     } catch (error) {
       console.error(error)
-      setLoadError('No se pudieron cargar tus partidos. Revisá tu conexión y las reglas de Firestore.')
+      setLoadError(getErrorMessage(error, 'No se pudieron cargar tus partidos. Intentá de nuevo en unos segundos.'))
     } finally {
       setLoading(false)
     }
@@ -77,9 +78,16 @@ function App() {
     setToast({ message, type })
   }
 
+  // Si el navegador sabe que no hay internet, avisamos enseguida
+  // en vez de dejar al usuario esperando un guardado que no va a llegar.
+  function checkOnline() {
+    if (!navigator.onLine) throw offlineError()
+  }
+
   // Crear o editar. Devuelve true si se guardó, false si falló.
   async function handleSave(data) {
     try {
+      checkOnline()
       if (form.match) {
         await updateMatch(form.match.id, data)
         showToast('Partido actualizado.')
@@ -93,7 +101,7 @@ function App() {
       return true
     } catch (error) {
       console.error(error)
-      showToast('No se pudo guardar el partido. Intentá de nuevo.', 'error')
+      showToast(getErrorMessage(error, 'No se pudo guardar el partido. Intentá de nuevo.'), 'error')
       return false
     }
   }
@@ -101,13 +109,14 @@ function App() {
   async function handleConfirmDelete() {
     setDeleting(true)
     try {
+      checkOnline()
       await deleteMatch(matchToDelete.id)
       await loadMatches(user.uid)
       showToast('Partido eliminado.')
       setMatchToDelete(null)
     } catch (error) {
       console.error(error)
-      showToast('No se pudo eliminar el partido.', 'error')
+      showToast(getErrorMessage(error, 'No se pudo eliminar el partido. Intentá de nuevo.'), 'error')
     } finally {
       setDeleting(false)
     }
@@ -117,12 +126,13 @@ function App() {
   async function quickUpdate(match, changes, successMessage) {
     setBusyId(match.id)
     try {
+      checkOnline()
       await updateMatch(match.id, changes)
       await loadMatches(user.uid)
       showToast(successMessage)
     } catch (error) {
       console.error(error)
-      showToast('No se pudo actualizar el partido.', 'error')
+      showToast(getErrorMessage(error, 'No se pudo actualizar el partido. Intentá de nuevo.'), 'error')
     } finally {
       setBusyId(null)
     }
@@ -139,8 +149,12 @@ function App() {
         { favorite: !match.favorite },
         match.favorite ? 'Quitado de favoritos.' : 'Agregado a favoritos.'
       ),
+    // "Asistí" abre el formulario para cargar el resultado en el momento.
+    // "No asistí" se guarda directo.
     onChangeStatus: (match, status) =>
-      quickUpdate(match, { status }, `Partido marcado como "${STATUS_LABELS[status]}".`),
+      status === STATUS.ATTENDED
+        ? setForm({ match, defaults: { status } })
+        : quickUpdate(match, { status }, `Partido marcado como "${STATUS_LABELS[status]}".`),
   }
 
   if (!isFirebaseConfigured) {
@@ -177,6 +191,7 @@ function App() {
                 <Loader text="Cargando tu historial de hincha..." />
               ) : (
                 <div className="error-box" role="alert">
+                  <h2>No pudimos cargar tu historial</h2>
                   <p>{loadError}</p>
                   {user && (
                     <button className="btn btn-primary" onClick={() => loadMatches(user.uid)}>
@@ -202,7 +217,13 @@ function App() {
       </footer>
 
       {form && (
-        <MatchForm match={form.match} defaults={form.defaults} onSave={handleSave} onClose={() => setForm(null)} />
+        <MatchForm
+          match={form.match}
+          defaults={form.defaults}
+          matches={matches}
+          onSave={handleSave}
+          onClose={() => setForm(null)}
+        />
       )}
 
       {matchToDelete && (

@@ -1,14 +1,24 @@
 import { CalendarDays, MapPin, MessageSquareQuote, Pencil, Star, Trash2, Trophy } from 'lucide-react'
-import { STATUS, STATUS_LABELS, formatDate, getOutcome, hasResult, isPastUpcoming } from '../utils/matchUtils'
-
-const OUTCOME_LABELS = { victoria: 'Victoria', empate: 'Empate', derrota: 'Derrota' }
+import {
+  OUTCOME_LABELS,
+  STATUS,
+  STATUS_LABELS,
+  canMarkAttendance,
+  formatDate,
+  formatTime,
+  getOutcome,
+  hasResult,
+  isPastUpcoming,
+} from '../utils/matchUtils'
 
 // Tarjeta que muestra la información de un partido y sus acciones.
 function MatchCard({ match, busy, onEdit, onDelete, onToggleFavorite, onChangeStatus }) {
   const outcome = getOutcome(match)
   const isUpcoming = match.status === STATUS.UPCOMING
-  // Un próximo cuya fecha ya pasó: le preguntamos al usuario si fue.
+  // Un próximo que ya se jugó: le preguntamos al usuario si fue.
   const isPast = isPastUpcoming(match)
+  // Los botones de asistencia solo aparecen desde el día del partido.
+  const showAttendance = isUpcoming && onChangeStatus && canMarkAttendance(match)
 
   return (
     <article className={`match-card ${busy ? 'is-busy' : ''} ${isPast ? 'is-past' : ''}`}>
@@ -42,7 +52,7 @@ function MatchCard({ match, busy, onEdit, onDelete, onToggleFavorite, onChangeSt
       <ul className="match-meta">
         <li>
           <CalendarDays size={16} /> {formatDate(match.date)}
-          {match.time && ` · ${match.time} h`}
+          {(match.time || isUpcoming) && ` · ${formatTime(match)}`}
         </li>
         {match.competition && (
           <li>
@@ -66,7 +76,7 @@ function MatchCard({ match, busy, onEdit, onDelete, onToggleFavorite, onChangeSt
       {/* En "Próximos" se puede marcar si fue o no al partido */}
       {isPast && <p className="past-notice">Este partido ya se jugó. ¿Fuiste?</p>}
 
-      {isUpcoming && onChangeStatus && (
+      {showAttendance && (
         <div className="status-actions">
           <button
             className="btn btn-small btn-primary"
