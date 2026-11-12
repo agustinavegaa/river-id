@@ -1,11 +1,15 @@
-import { BarChart3, Equal, ListChecks, MapPin, Star, Swords, ThumbsDown, Ticket, Trophy } from 'lucide-react'
+import { BarChart3, Equal, ListChecks, MapPin, Star, Swords, ThumbsDown, Ticket, Trophy, Users } from 'lucide-react'
 import EmptyState from '../components/EmptyState'
 import PageHeader from '../components/PageHeader'
 import ResultsChart from '../components/ResultsChart'
 import StatCard from '../components/StatCard'
-import { calculateCuriosities, calculateStats } from '../utils/matchUtils'
+import { calculateCuriosities, calculateStats, joinNames } from '../utils/matchUtils'
 
 const plural = (n) => `${n} ${n === 1 ? 'partido' : 'partidos'}`
+
+// Si empatan muchos, mostramos los dos primeros y cuántos más hay.
+const shortList = (names) =>
+  names.length <= 3 ? joinNames(names) : `${names.slice(0, 2).join(', ')} y ${names.length - 2} más`
 
 // Muestra el dato curioso. Si hay empate, lo decimos en lugar de elegir uno.
 function Curiosity({ icon: Icon, label, data }) {
@@ -15,7 +19,7 @@ function Curiosity({ icon: Icon, label, data }) {
       <span>{label}</span>
       {data ? (
         <>
-          <strong>{data.names.length === 1 ? data.names[0] : `Empate: ${data.names.join(', ')}`}</strong>
+          <strong>{data.names.length === 1 ? data.names[0] : `Empate: ${shortList(data.names)}`}</strong>
           <small>
             {plural(data.count)}
             {data.names.length > 1 && ' cada uno'}
@@ -107,6 +111,7 @@ function StatsPage({ matches, onNavigate }) {
                 <Curiosity icon={Swords} label="Rival que más viste" data={curiosities.topRival} />
                 <Curiosity icon={MapPin} label="Estadio que más visitaste" data={curiosities.topStadium} />
                 <Curiosity icon={Trophy} label="Competición más frecuente" data={curiosities.topCompetition} />
+                <Curiosity icon={Users} label="Con quién fuiste más" data={curiosities.topCompanion} />
               </div>
             </section>
           </>

@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 import Modal from './Modal'
-import { COMPETITIONS, STATUS, STATUS_LABELS, formatDate, todayString } from '../utils/matchUtils'
+import { COMPETITIONS, STATUS, STATUS_LABELS, formatDate, normalizeName, todayString } from '../utils/matchUtils'
 
 const MAX_RIVAL = 40
 const MAX_GOALS = 30
@@ -17,6 +17,7 @@ const EMPTY_FORM = {
   status: STATUS.ATTENDED,
   comment: '',
   favorite: false,
+  companions: [],
 }
 
 // Pasa un partido guardado al formato del formulario (los goles como texto).
@@ -34,13 +35,9 @@ function toFormValues(match, defaults) {
     status: match.status ?? STATUS.ATTENDED,
     comment: match.comment ?? '',
     favorite: Boolean(match.favorite),
+    companions: match.companions || [],
     ...defaults,
   }
-}
-
-// Normaliza un nombre para comparar: sin mayúsculas, acentos ni espacios de más.
-function normalize(text) {
-  return text.trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, ' ')
 }
 
 // Un gol válido es un entero entre 0 y MAX_GOALS. El campo vacío también es válido.
@@ -83,7 +80,7 @@ function validate(values, matches, editingId) {
   // Duplicados: mismo rival en la misma fecha (sin contar el partido que se está editando).
   if (!errors.rival && values.date) {
     const duplicate = matches.find(
-      (m) => m.id !== editingId && m.date === values.date && normalize(m.rival) === normalize(rival)
+      (m) => m.id !== editingId && m.date === values.date && normalizeName(m.rival) === normalizeName(rival)
     )
     if (duplicate) {
       errors.rival = `Ya registraste River vs ${duplicate.rival} el ${formatDate(values.date)}.`
@@ -94,7 +91,7 @@ function validate(values, matches, editingId) {
 }
 
 // Formulario para crear o editar un partido.
-function MatchForm({ match, defaults, matches, onSave, onClose }) {
+function MatchForm({ match, defaults, matches, companions, onSave, onClose, onOpenProfile }) {
   const isEditing = Boolean(match)
   const [values, setValues] = useState(() => toFormValues(match, defaults))
   const [errors, setErrors] = useState({})
@@ -104,6 +101,18 @@ function MatchForm({ match, defaults, matches, onSave, onClose }) {
   const submittingRef = useRef(false)
 
   const isUpcoming = values.status === STATUS.UPCOMING
+  // Opciones: el grupo actual + quienes ya estaban marcados en este partido
+  // (por si después los sacó del grupo, no se pierden).
+  const companionOptions = [...companions, ...values.companions.filter((c) => !companions.includes(c))]
+
+  function toggleCompanion(person) {
+    setValues((prev) => ({
+      ...prev,
+      companions: prev.companions.includes(person)
+        ? prev.companions.filter((c) => c !== person)
+        : [...prev.companions, person],
+    }))
+  }
 
   function handleChange(e) {
     const { name, value, type, checked } = e.target
@@ -137,6 +146,8 @@ function MatchForm({ match, defaults, matches, onSave, onClose }) {
       status: values.status,
       comment: values.comment.trim(),
       favorite: values.favorite,
+      // Se guardan en el mismo orden que el grupo.
+      companions: companionOptions.filter((c) => values.companions.includes(c)),
     }
 
     submittingRef.current = true
@@ -308,6 +319,34 @@ function MatchForm({ match, defaults, matches, onSave, onClose }) {
               {values.comment.length}/{MAX_COMMENT}
             </small>
           </label>
+
+          <fieldset className="field">
+            <legend>{isUpcoming ? '¿Con quién vas?' : '¿Con quién fuiste?'}</legend>
+            {companionOptions.length > 0 ? (
+              <div className="companion-picker">
+                {companionOptions.map((person) => (
+                  <label
+                    key={person}
+                    className={values.companions.includes(person) ? 'pick-chip active' : 'pick-chip'}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={values.companions.includes(person)}
+                      onChange={() => toggleCompanion(person)}
+                    />
+                    {person}
+                  </label>
+                ))}
+              </div>
+            ) : (
+              <p className="field-hint form-info">
+                Todavía no armaste tu grupo de cancha.{' '}
+                <button type="button" className="link-btn" onClick={onOpenProfile}>
+                  Armarlo en Mi perfil
+                </button>
+              </p>
+            )}
+          </fieldset>
 
           <label className="checkbox">
             <input type="checkbox" name="favorite" checked={values.favorite} onChange={handleChange} />

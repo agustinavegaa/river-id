@@ -17,13 +17,14 @@ Aplicación web para hinchas de River Plate: un **diario digital del hincha** do
 El escudo y las fotos de `public/images/` pertenecen al Club Atlético River Plate y a sus autores; se usan solo con fines educativos.
 - Vercel (despliegue)
 
-## Funcionalidades (versión 3)
+## Funcionalidades (versión 4)
 
 - **Inicio:** portada con cuenta regresiva al próximo partido (si no tiene hora, solo los días), accesos rápidos, carrusel de partidos a los que fuiste, sección "Sobre River ID" y banner con tu récord.
 - **Mis partidos:** agregar, consultar, editar y eliminar partidos; favoritos; comentario personal; búsqueda por rival; filtros por estado, resultado y competición; orden por fecha.
 - **Próximos:** "¿Fuiste?" (partidos ya jugados) y "Se vienen" (en orden de fecha y hora); "Asistí" abre el formulario para cargar el resultado.
 - **Estadísticas:** porcentaje de victorias, gráfico de resultados, partidos asistidos, victorias, empates, derrotas, favoritos y datos curiosos.
 - **Formulario:** validaciones con mensajes específicos, aviso de duplicados y bloqueo de doble envío.
+- **Mi perfil:** tu nombre (la app te saluda) y tu **grupo de cancha**: las personas con las que vas. En cada partido marcás con quién fuiste y en Estadísticas aparece "Con quién fuiste más".
 
 ## Instalación y ejecución local
 
@@ -81,14 +82,23 @@ Colección `matches`. Cada documento es un partido:
 | `status`      | string             | `proximo`, `asisti` o `no_asisti`                |
 | `comment`     | string             | Recuerdo o comentario personal                   |
 | `favorite`    | boolean            | Partido favorito                                 |
+| `companions`  | string[]           | Con quién fue (opcional, desde la versión 4)     |
 | `createdAt`   | timestamp          | Fecha de creación                                |
 | `updatedAt`   | timestamp          | Última modificación                              |
 
 Un resultado vacío se guarda como `null`, para no confundirlo con un 0-0.
 
+Colección `profiles` (desde la versión 4). Un documento por usuario, con su `uid` como id:
+
+| Campo        | Tipo      | Descripción                                    |
+| ------------ | --------- | ---------------------------------------------- |
+| `name`       | string    | Nombre del hincha (hasta 30 caracteres)        |
+| `companions` | string[]  | Grupo de cancha (hasta 20 personas)            |
+| `updatedAt`  | timestamp | Última modificación                            |
+
 ## Reglas de seguridad
 
-Las reglas ([`firestore.rules`](./firestore.rules)) permiten que cada usuario lea, cree, modifique y elimine **solo sus propios partidos** (los que tienen su `uid`). Cualquier otra colección queda cerrada.
+Las reglas ([`firestore.rules`](./firestore.rules)) permiten que cada usuario lea, cree, modifique y elimine **solo sus propios partidos** (los que tienen su `uid`) y **solo su propio perfil** (el documento `profiles/{uid}`, con nombre de hasta 30 caracteres y grupo de hasta 20 personas). Cualquier otra colección queda cerrada.
 
 Como se usa acceso anónimo, cada navegador tiene su propia identidad: abrir la app desde otro dispositivo no muestra la misma lista.
 
@@ -117,6 +127,7 @@ src/
 - **Agregar:** `addMatch()` (usa `addDoc`)
 - **Modificar:** `updateMatch()` (usa `updateDoc`) — editar, favorito y cambio de estado
 - **Eliminar:** `deleteMatch()` (usa `deleteDoc`)
+- **Perfil:** `getProfile()` y `saveProfile()` en `src/services/profileService.js` (usan `getDoc` y `setDoc`)
 - Estas funciones se llaman desde `src/App.jsx` (`handleSave`, `handleConfirmDelete`, `quickUpdate`).
 
 ## Despliegue en Vercel

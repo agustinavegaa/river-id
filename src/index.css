@@ -328,6 +328,27 @@ code {
   background: var(--gray-bg);
 }
 
+/* Botón de perfil en el header (versión 4) */
+.btn-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--white);
+  font-weight: 700;
+}
+
+.btn-avatar:hover,
+.btn-avatar.active {
+  background: var(--white);
+  color: var(--black);
+}
+
 /* ---------- Banda oscura (portada de cada pantalla) ---------- */
 
 .band {
@@ -1410,7 +1431,7 @@ code {
 
 .curiosities {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 14px;
 }
 
@@ -1568,6 +1589,137 @@ code {
 
 .setup-screen p {
   color: var(--gray-text);
+}
+
+/* ---------- Perfil y grupo de cancha (versión 4) ---------- */
+
+.welcome {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  text-align: center;
+}
+
+.welcome p {
+  margin: 0;
+  color: var(--gray-text);
+}
+
+.welcome .field,
+.welcome .modal-actions {
+  width: 100%;
+  text-align: left;
+}
+
+.profile-card {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 28px;
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  box-shadow: var(--shadow);
+}
+
+.profile-card .list-heading {
+  margin-bottom: 0;
+}
+
+.inline-form {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.inline-form .field {
+  flex: 1;
+  max-width: 420px;
+}
+
+/* El botón se alinea con el campo, no con la etiqueta */
+.inline-form .btn {
+  margin-top: 27px;
+}
+
+.companion-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 10px;
+}
+
+.companion {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 8px 10px 12px;
+  border-radius: 16px;
+  background: var(--gray-bg);
+}
+
+.companion-initial {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--red);
+  color: var(--white);
+  font-weight: 700;
+}
+
+.companion-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.companion-text strong {
+  overflow-wrap: break-word;
+}
+
+.companion-text small {
+  color: var(--gray-text);
+}
+
+/* Selector de compañeros en el formulario */
+.companion-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pick-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 14px;
+  border: 1px solid var(--border);
+  border-radius: 99px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.pick-chip input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.pick-chip.active {
+  background: var(--black);
+  border-color: var(--black);
+  color: var(--white);
+}
+
+.pick-chip:has(input:focus-visible) {
+  outline: 3px solid rgba(158, 24, 43, 0.45);
 }
 
 /* ---------- Toast ---------- */
@@ -1867,6 +2019,10 @@ code {
 
 /* Filtros: la búsqueda pasa a su propia fila antes de que se corten los textos */
 @media (max-width: 1100px) {
+  .curiosities {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
   .toolbar-row {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
@@ -1905,10 +2061,6 @@ code {
   .about {
     grid-template-columns: 1fr;
     gap: 16px;
-  }
-
-  .curiosities {
-    grid-template-columns: 1fr;
   }
 }
 
@@ -2076,6 +2228,27 @@ code {
   .quick-actions {
     grid-template-columns: 1fr;
     gap: 10px;
+  }
+
+  .curiosities {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-card {
+    padding: 20px;
+  }
+
+  .inline-form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .inline-form .field {
+    max-width: none;
+  }
+
+  .inline-form .btn {
+    margin-top: 0;
   }
 
   .quick-action {

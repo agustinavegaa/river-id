@@ -26,6 +26,19 @@ service cloud.firestore {
         && request.resource.data.uid == request.auth.uid;
     }
 
+    // Perfil del usuario: su nombre y su grupo de cancha (versión 4).
+    // El documento se llama igual que su uid, así solo el dueño puede usarlo.
+    match /profiles/{userId} {
+      allow read, delete: if request.auth != null && request.auth.uid == userId;
+
+      allow create, update: if request.auth != null
+        && request.auth.uid == userId
+        && request.resource.data.name is string
+        && request.resource.data.name.size() <= 30
+        && request.resource.data.companions is list
+        && request.resource.data.companions.size() <= 20;
+    }
+
     // Cualquier otra colección queda cerrada.
     match /{document=**} {
       allow read, write: if false;

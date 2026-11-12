@@ -1,4 +1,4 @@
-import { BarChart3, CalendarClock, Home, ListChecks, Plus } from 'lucide-react'
+import { BarChart3, CalendarClock, Home, ListChecks, Plus, User } from 'lucide-react'
 import Logo from './Logo'
 
 export const PAGES = [
@@ -10,7 +10,7 @@ export const PAGES = [
 
 // Barra superior: logo, menú en "píldora" y botón para agregar.
 // En celulares el menú se convierte en una barra fija abajo (ver index.css).
-function Header({ currentPage, onNavigate, onAdd }) {
+function Header({ currentPage, onNavigate, onAdd, profileName }) {
   return (
     <header className="header">
       <button className="header-brand" onClick={() => onNavigate('inicio')} aria-label="Ir al inicio">
@@ -33,6 +33,15 @@ function Header({ currentPage, onNavigate, onAdd }) {
       </nav>
 
       <div className="header-actions">
+        {/* Acceso a "Mi perfil": muestra la inicial del nombre si lo cargó */}
+        <button
+          className={currentPage === 'perfil' ? 'btn-avatar active' : 'btn-avatar'}
+          onClick={() => onNavigate('perfil')}
+          aria-label="Mi perfil"
+          title={profileName ? `Perfil de ${profileName}` : 'Mi perfil'}
+        >
+          {profileName ? profileName.charAt(0).toUpperCase() : <User size={18} />}
+        </button>
         <button className="btn-pill btn-pill-light" onClick={onAdd}>
           Agregar partido
         </button>

@@ -178,5 +178,30 @@ export function calculateCuriosities(matches) {
     topRival: mostCommon(attended, 'rival'),
     topStadium: mostCommon(attended, 'stadium'),
     topCompetition: mostCommon(attended, 'competition'),
+    topCompanion: getTopCompanion(matches),
   }
+}
+
+// ---------- Versión 4: nombre y grupo de cancha ----------
+
+// Normaliza un nombre para comparar: sin mayúsculas, acentos ni espacios de más.
+export function normalizeName(text) {
+  return text.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ')
+}
+
+// Une nombres en castellano: "Papá", "Papá y Juli", "Papá, Juli y Martín".
+export function joinNames(names) {
+  if (names.length <= 1) return names.join('')
+  return `${names.slice(0, -1).join(', ')} y ${names[names.length - 1]}`
+}
+
+// Con quién fue más veces (solo partidos "Asistí"). Devuelve los empatados si los hay.
+export function getTopCompanion(matches) {
+  const counts = {}
+  matches
+    .filter((m) => m.status === STATUS.ATTENDED)
+    .forEach((m) => (m.companions || []).forEach((name) => (counts[name] = (counts[name] || 0) + 1)))
+  const max = Math.max(0, ...Object.values(counts))
+  if (max === 0) return null
+  return { names: Object.keys(counts).filter((name) => counts[name] === max), count: max }
 }

@@ -6,15 +6,30 @@ import Header from './components/Header'
 import MatchForm from './components/MatchForm'
 import PageHeader from './components/PageHeader'
 import Toast from './components/Toast'
+import WelcomeModal from './components/WelcomeModal'
 import { isFirebaseConfigured } from './firebase/config'
 import HomePage from './pages/HomePage'
 import MatchesPage from './pages/MatchesPage'
+import ProfilePage from './pages/ProfilePage'
 import StatsPage from './pages/StatsPage'
 import UpcomingPage from './pages/UpcomingPage'
 import { listenToUser } from './services/authService'
 import { addMatch, deleteMatch, getMatches, updateMatch } from './services/matchesService'
+import { getProfile, saveProfile } from './services/profileService'
 import { getErrorMessage, offlineError } from './utils/errors'
 import { STATUS, STATUS_LABELS } from './utils/matchUtils'
+
+// Recordamos en el navegador si el usuario salteó la bienvenida (solo comodidad;
+// los datos reales del perfil se guardan en Firestore).
+const WELCOME_KEY = 'riverid-welcome-skipped'
+
+function readWelcomeSkipped() {
+  try {
+    return localStorage.getItem(WELCOME_KEY) === 'yes'
+  } catch {
+    return false
+  }
+}
 
 function App() {
   const [user, setUser] = useState(null)
@@ -29,6 +44,11 @@ function App() {
   const [deleting, setDeleting] = useState(false)
   // id del partido que se está actualizando (favorito / estado)
   const [busyId, setBusyId] = useState(null)
+  // Perfil (versión 4): nombre y grupo de cancha. null = todavía no tiene perfil.
+  const [profile, setProfile] = useState(null)
+  const [profileLoaded, setProfileLoaded] = useState(false)
+  const [profileError, setProfileError] = useState('')
+  const [welcomeSkipped, setWelcomeSkipped] = useState(() => readWelcomeSkipped())
 
   // 1. Al iniciar, Firebase Authentication nos da un usuario anónimo.
   useEffect(() => {
@@ -44,9 +64,12 @@ function App() {
     return unsubscribe
   }, [])
 
-  // 2. Cuando tenemos usuario, consultamos sus partidos en Firestore.
+  // 2. Cuando tenemos usuario, consultamos sus partidos y su perfil en Firestore.
   useEffect(() => {
-    if (user) loadMatches(user.uid)
+    if (user) {
+      loadMatches(user.uid)
+      loadProfile(user.uid)
+    }
   }, [user])
 
   // Al cambiar de pantalla, volvemos al principio de la página.
@@ -72,6 +95,46 @@ function App() {
     } finally {
       setLoading(false)
     }
+  }
+
+  // El perfil se carga aparte: si falla, el resto de la app sigue funcionando.
+  async function loadProfile(uid) {
+    try {
+      setProfile(await getProfile(uid))
+      setProfileError('')
+    } catch (error) {
+      console.error(error)
+      setProfileError(getErrorMessage(error, 'No se pudo cargar tu perfil. Intentá de nuevo.'))
+    } finally {
+      setProfileLoaded(true)
+    }
+  }
+
+  // Guarda el nombre y/o el grupo. Devuelve true si se guardó.
+  async function handleSaveProfile(changes) {
+    const updated = { name: profile?.name || '', companions: profile?.companions || [], ...changes }
+    try {
+      checkOnline()
+      await saveProfile(user.uid, updated)
+      // Volvemos a leer para mostrar lo que realmente quedó guardado.
+      await loadProfile(user.uid)
+      showToast(changes.name ? `¡Listo, ${changes.name}!` : 'Grupo de cancha actualizado.')
+      return true
+    } catch (error) {
+      console.error(error)
+      showToast(getErrorMessage(error, 'No se pudo guardar tu perfil. Intentá de nuevo.'), 'error')
+      return false
+    }
+  }
+
+  // "Ahora no" en la bienvenida: lo recordamos en este navegador para no insistir.
+  function skipWelcome() {
+    try {
+      localStorage.setItem(WELCOME_KEY, 'yes')
+    } catch {
+      // Si el navegador no deja guardar, solo se vuelve a mostrar la próxima vez.
+    }
+    setWelcomeSkipped(true)
   }
 
   function showToast(message, type = 'success') {
@@ -171,7 +234,16 @@ function App() {
   }
 
   function renderPage() {
-    const props = { matches, actions, busyId, onNavigate: setCurrentPage }
+    const props = { matches, actions, busyId, onNavigate: setCurrentPage, profile }
+    if (currentPage === 'perfil')
+      return (
+        <ProfilePage
+          {...props}
+          profileError={profileError}
+          onSaveProfile={handleSaveProfile}
+          onRetryProfile={() => loadProfile(user.uid)}
+        />
+      )
     if (currentPage === 'partidos') return <MatchesPage {...props} />
     if (currentPage === 'proximos') return <UpcomingPage {...props} />
     if (currentPage === 'estadisticas') return <StatsPage {...props} />
@@ -180,10 +252,15 @@ function App() {
 
   return (
     <div className="app">
-      <Header currentPage={currentPage} onNavigate={setCurrentPage} onAdd={() => actions.onAdd()} />
+      <Header
+        currentPage={currentPage}
+        onNavigate={setCurrentPage}
+        onAdd={() => actions.onAdd()}
+        profileName={profile?.name}
+      />
 
       <main className="main">
-        {loading || loadError ? (
+        {loading || !profileLoaded || loadError ? (
           <>
             <PageHeader kicker="Mi vida como hincha" title="River ID" image="/images/monumental-noche.webp" />
             <div className="sheet">
@@ -221,9 +298,19 @@ function App() {
           match={form.match}
           defaults={form.defaults}
           matches={matches}
+          companions={profile?.companions || []}
           onSave={handleSave}
           onClose={() => setForm(null)}
+          onOpenProfile={() => {
+            setForm(null)
+            setCurrentPage('perfil')
+          }}
         />
+      )}
+
+      {/* Bienvenida: si todavía no tiene perfil y no la salteó */}
+      {profileLoaded && !profileError && !profile && !welcomeSkipped && !loading && !loadError && (
+        <WelcomeModal onSave={handleSaveProfile} onSkip={skipWelcome} />
       )}
 
       {matchToDelete && (

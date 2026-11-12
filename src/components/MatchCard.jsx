@@ -1,4 +1,4 @@
-import { CalendarDays, MapPin, MessageSquareQuote, Pencil, Star, Trash2, Trophy } from 'lucide-react'
+import { CalendarDays, MapPin, MessageSquareQuote, Pencil, Star, Trash2, Trophy, Users } from 'lucide-react'
 import {
   OUTCOME_LABELS,
   STATUS,
@@ -7,6 +7,7 @@ import {
   formatDate,
   formatTime,
   getOutcome,
+  joinNames,
   hasResult,
   isPastUpcoming,
 } from '../utils/matchUtils'
@@ -62,6 +63,11 @@ function MatchCard({ match, busy, onEdit, onDelete, onToggleFavorite, onChangeSt
         {match.stadium && (
           <li>
             <MapPin size={16} /> {match.stadium}
+          </li>
+        )}
+        {match.companions?.length > 0 && (
+          <li>
+            <Users size={16} /> {isUpcoming ? 'Vas con' : 'Con'} {joinNames(match.companions)}
           </li>
         )}
       </ul>

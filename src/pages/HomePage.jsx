@@ -4,7 +4,7 @@ import Countdown from '../components/Countdown'
 import EmptyState from '../components/EmptyState'
 import { STATUS, calculateStats, formatDate, formatTime, getNextMatch, isPastUpcoming, sortByDate } from '../utils/matchUtils'
 
-function HomePage({ matches, actions, onNavigate }) {
+function HomePage({ matches, actions, onNavigate, profile }) {
   const stats = calculateStats(matches)
   const nextMatch = getNextMatch(matches)
   // Próximos: los que todavía no se jugaron y los que falta confirmar si fue.
@@ -21,7 +21,7 @@ function HomePage({ matches, actions, onNavigate }) {
         <div className="hero-media" aria-hidden="true" />
 
         <div className="band-content">
-          <p className="kicker">Mi vida como hincha</p>
+          <p className="kicker">{profile?.name ? `Hola, ${profile.name} · Mi vida como hincha` : 'Mi vida como hincha'}</p>
           <h1 className="display hero-title">
             <span>Mi historia</span>
             <span className="hero-title-indent">en la cancha</span>

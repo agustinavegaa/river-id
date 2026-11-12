@@ -163,7 +163,7 @@ Se subió el código a GitHub (https://github.com/agustinavegaa/river-id), se im
 | 6. Validaciones, carga, éxito/error, responsive | Hecho y probado (con servicios simulados) |
 | 7. Reglas de Firestore | Publicadas; acceso sin login rechazado |
 | Bitácora e informe | En curso (este documento) |
-| Iteraciones | V1 y V2 publicadas; V3 lista en rama `version-3` |
+| Iteraciones | V1, V2 y V3 publicadas; V4 en rama `version-4` |
 
 ### Capturas
 
@@ -390,5 +390,84 @@ Objetivo: una versión funcionalmente sólida y consistente, que sirva de base p
 
 ### Pendiente
 
-- [ ] Publicar la V3 en Vercel (unir `version-3` con `main`) y repetir la prueba en la URL publicada.
-- [ ] Versión 4: interacciones, animaciones y microinteracciones.
+- [x] Publicada en Vercel el 12/11/2026 (se unió `version-3` con `main`). En la URL publicada se comprobó que carga los accesos rápidos, se conecta a Firebase y la consola no muestra errores.
+- La Versión 4 se dedicó finalmente al nombre y al grupo de cancha (ver abajo). Las animaciones quedaron fuera por la fecha de entrega.
+
+
+---
+
+## Versión 4 — Tu nombre y tu grupo de cancha
+
+**Fecha:** 12/11/2026 · **Rama:** `version-4`
+
+### Idea
+
+Personalizar la experiencia: que la app sepa cómo te llamás y con quién vas a la cancha. Ir a ver a River casi nunca es solo, y "con quién fui" es parte del recuerdo.
+
+### Decisiones tomadas (con la IA, antes de programar)
+
+| Pregunta | Opciones | Elegido | Motivo |
+| --- | --- | --- | --- |
+| ¿Qué es el "grupo de cancha"? | Lista personal de compañeros / Grupo compartido entre usuarios con código | **Lista personal** | Simple, segura (cada usuario ve solo lo suyo) y posible de terminar y probar antes de la entrega. El grupo compartido necesitaba reglas entre usuarios y más pruebas. |
+| ¿Sumar animaciones en V4? | Sí / No | **No** | Enfocarse en las dos funciones nuevas y reducir riesgo antes de la entrega. |
+| ¿Publicar V3 antes de empezar? | Ahora / Al final | **Ahora** | Tener una versión probada en la URL mientras se trabaja. |
+
+### Cambio en Firebase (mostrado y aprobado antes de hacerlo)
+
+- **Colección nueva `profiles`**: un documento por usuario (`profiles/{uid}`) con `name` y `companions`.
+- **Campo nuevo opcional `companions`** en cada partido. Los partidos viejos siguen funcionando: si no tienen el campo, se toman como "sin compañeros".
+- **Regla nueva** en `firestore.rules` para `profiles`: solo el dueño puede leer y escribir su perfil; nombre de hasta 30 caracteres y grupo de hasta 20 personas. La regla de `matches` no cambió.
+
+### Funcionalidades nuevas
+
+- [x] **Bienvenida**: la primera vez la app pregunta el nombre ("¡Bienvenido, hincha!"). Se puede saltear con "Ahora no", y eso se recuerda en el navegador (solo esa preferencia; el perfil se guarda en Firestore).
+- [x] **Saludo**: "Hola, Agustina · Mi vida como hincha" en la portada; la inicial aparece en un botón redondo del encabezado que lleva a **Mi perfil**.
+- [x] **Mi perfil**: cambiar el nombre y armar el **grupo de cancha** (agregar y sacar personas). Cada persona muestra cuántos partidos fueron juntos.
+- [x] Validaciones: nombre vacío, nombre repetido ("Papá ya está en tu grupo", sin importar mayúsculas ni acentos), hasta 30 caracteres y hasta 20 personas.
+- [x] **Formulario de partido**: "¿Con quién fuiste?" (o "¿Con quién vas?" en un próximo) con chips para marcar. Si el grupo está vacío, un acceso "Armarlo en Mi perfil".
+- [x] Si sacás a alguien del grupo, **los partidos donde lo marcaste lo siguen mostrando** (y sigue apareciendo marcado al editar ese partido).
+- [x] **Tarjetas**: "Con Papá y Juli" (o "Vas con…" en próximos).
+- [x] **Estadísticas**: nuevo dato curioso **"Con quién fuiste más"** (solo partidos "Asistí"). Los empates largos se resumen: "Superclásico, Liga Profesional y 3 más".
+- [x] Si el perfil no se puede cargar, el resto de la app sigue funcionando y Mi perfil muestra el error con "Reintentar".
+
+### Componentes y archivos
+
+- Nuevos: `src/services/profileService.js`, `src/components/WelcomeModal.jsx`, `src/pages/ProfilePage.jsx`.
+- Modificados: `App.jsx`, `Header.jsx` (botón de perfil), `MatchForm.jsx`, `MatchCard.jsx`, `HomePage.jsx`, `StatsPage.jsx`, `utils/matchUtils.js`, `index.css`, `firestore.rules`, `README.md`.
+
+### Dificultades y soluciones
+
+| Dificultad | Solución |
+| --- | --- |
+| Las reglas cerraban toda colección que no fuera `matches`, así que el perfil no se podía guardar. | Se agregó una regla para `profiles` (mostrada y aprobada antes de hacerlo). Hay que publicarla en Firebase Console: Vercel no la publica. |
+| Una edición automática del formulario se cortó a mitad de camino porque el texto buscado tenía caracteres de acentos escritos de otra forma. | Se revisó qué partes se habían aplicado y se completó el resto. Además, el rango de acentos en el código quedó escrito como `\u0300-\u036f` para que se lea. |
+| Si alguien sale del grupo, ¿se borra de los partidos viejos? | No: el formulario ofrece el grupo actual más quienes ya estaban marcados en ese partido. |
+| Con muchas competiciones empatadas, el dato curioso quedaba larguísimo. | Se muestran las dos primeras y "y N más". |
+| En tablet, una regla vieja ponía los datos curiosos en una sola columna. | Se quitó; ahora van de a dos. |
+
+### Pruebas realizadas (servicios simulados)
+
+- [x] Bienvenida: vacío → "Escribí tu nombre o tocá “Ahora no”."; con "Agustina" → se guarda, mensaje "¡Listo, Agustina!", saludo en la portada e inicial "A" en el encabezado.
+- [x] "Ahora no" → al recargar no vuelve a aparecer.
+- [x] Mi perfil: agregar vacío → error; agregar Papá, Juli y Martín (con Enter); "  papa " → "Papá ya está en tu grupo."
+- [x] Partido Boca 2–0 con Papá y Juli, Boca 2–1 con Papá → tarjetas "Con Papá y Juli" y "Con Papá"; Mi perfil: Papá 2, Juli 1, Martín 0 partidos juntos.
+- [x] Estadísticas: "Con quién fuiste más: Papá · 2 partidos".
+- [x] Sacar a Juli del grupo → el partido conserva a Juli y al editarlo sigue marcada.
+- [x] Guardado rechazado por Firebase (lo que pasa si la regla no está publicada) → "No tenés permiso…" y el nombre no cambia.
+- [x] Responsive: sin scroll horizontal en 320 px; encabezado en una fila en 768 y 820 px.
+- `npm run build` compila.
+
+### Pendiente
+
+- [ ] **Publicar la regla nueva** en Firebase Console → Firestore Database → Reglas.
+- [ ] Probar con Firebase real: nombre, grupo, compañeros en un partido, recargar y eliminar.
+- [ ] Publicar la V4 en Vercel y repetir la prueba en la URL.
+
+### Capturas recomendadas
+
+1. Bienvenida pidiendo el nombre.
+2. Portada con "Hola, Agustina" y la inicial en el encabezado.
+3. Mi perfil con el grupo de cancha.
+4. Formulario con "¿Con quién fuiste?".
+5. Tarjeta con "Con Papá y Juli" y Estadísticas con "Con quién fuiste más".
+6. Firebase Console → Reglas con el bloque `profiles`, y → Datos con un documento de `profiles`.
