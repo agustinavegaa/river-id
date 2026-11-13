@@ -163,7 +163,7 @@ Se subió el código a GitHub (https://github.com/agustinavegaa/river-id), se im
 | 6. Validaciones, carga, éxito/error, responsive | Hecho y probado (con servicios simulados) |
 | 7. Reglas de Firestore | Publicadas; acceso sin login rechazado |
 | Bitácora e informe | En curso (este documento) |
-| Iteraciones | V1, V2 y V3 publicadas; V4 en rama `version-4` |
+| Iteraciones | V1, V2, V3 y V4 publicadas |
 
 ### Capturas
 
@@ -457,11 +457,29 @@ Personalizar la experiencia: que la app sepa cómo te llamás y con quién vas a
 - [x] Responsive: sin scroll horizontal en 320 px; encabezado en una fila en 768 y 820 px.
 - `npm run build` compila.
 
-### Pendiente
+### Publicación de la regla
 
-- [ ] **Publicar la regla nueva** en Firebase Console → Firestore Database → Reglas.
-- [ ] Probar con Firebase real: nombre, grupo, compañeros en un partido, recargar y eliminar.
-- [ ] Publicar la V4 en Vercel y repetir la prueba en la URL.
+El primer intento de entrar a Firebase Console falló con "accounts.youtube.com tardó demasiado en responder" (ERR_TIMED_OUT): es un paso del inicio de sesión de Google, no un problema de la app. Se resolvió volviendo a intentar y la regla se publicó desde Firestore Database → Reglas.
+
+### Pruebas con Firebase real (local, después de publicar la regla)
+
+- [x] Leer el perfil ya no da error de permiso (antes de la regla, Firebase lo rechazaba).
+- [x] Bienvenida con "PRUEBA" → saludo "Hola, PRUEBA" e inicial "P"; al recargar sigue y no vuelve a aparecer la bienvenida.
+- [x] Agregar "Compañero A" y "Compañero B" al grupo → "Grupo de cancha actualizado."
+- [x] Partido "PRUEBA V4" (11/11, Asistí, 2–1) con Compañero A → al recargar la tarjeta dice "Con Compañero A"; Estadísticas: "Con quién fuiste más: Compañero A · 1 partido"; Mi perfil: 1 y 0 partidos juntos.
+- [x] **Las reglas rechazan lo indebido**: guardar un nombre de 31 caracteres → `permission-denied`; escribir el perfil de otro usuario → `permission-denied`; leer perfiles sin login (pedido directo a la API) → 403. El perfil real no cambió.
+- [x] Limpieza: se eliminó el partido desde la app y el perfil de prueba (la regla permite borrar el propio); al recargar, la bienvenida volvió a aparecer y la base quedó vacía. Consola sin errores.
+
+### Publicación en Vercel (12/11/2026)
+
+Se unió `version-4` con `main`; Vercel publicó la nueva versión sola (se comprobó que el código publicado ya incluía "Mi grupo de cancha").
+
+En https://river-id-ez6q.vercel.app:
+
+- [x] Bienvenida → "PRUEBA" → Mi perfil "Hola, PRUEBA"; agregar "Compañero A".
+- [x] Próximo "PRUEBA Vercel V4" (20/11, sin hora) con el formulario mostrando "¿Con quién vas?" → al recargar, en Próximos: "vie, 20 nov 2026 · Hora a confirmar | Vas con Compañero A".
+- [x] Eliminar el partido y sacar al compañero → al recargar: sin partidos y "Tu grupo está vacío". Consola sin errores.
+- Quedó guardado el nombre "PRUEBA" en el perfil del navegador usado para la prueba (la app no tiene botón para borrar el perfil). Solo lo ve ese navegador; se puede borrar desde Firebase Console → Firestore → Datos → `profiles`.
 
 ### Capturas recomendadas
 
