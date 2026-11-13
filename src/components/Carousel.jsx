@@ -1,6 +1,16 @@
 import { useRef } from 'react'
 import MatchTile from './MatchTile'
 
+// Fotos para las tarjetas. Se reparten en orden, así dos tarjetas
+// seguidas nunca tienen la misma foto.
+const PHOTOS = [
+  '/images/partidos/monumental-aereo.jpg',
+  '/images/partidos/bandera.jpg',
+  '/images/partidos/estadio-noche.jpg',
+  '/images/partidos/globos.jpg',
+  '/images/partidos/festejo-gol.jpg',
+]
+
 // Carrusel horizontal. En celular se desliza con el dedo;
 // en computadora también se puede arrastrar con el mouse.
 function Carousel({ matches, onOpen }) {
@@ -38,8 +48,8 @@ function Carousel({ matches, onOpen }) {
       onPointerUp={stopDrag}
       onPointerLeave={stopDrag}
     >
-      {matches.map((match) => (
-        <MatchTile key={match.id} match={match} onOpen={handleOpen} />
+      {matches.map((match, index) => (
+        <MatchTile key={match.id} match={match} photo={PHOTOS[index % PHOTOS.length]} onOpen={handleOpen} />
       ))}
     </div>
   )

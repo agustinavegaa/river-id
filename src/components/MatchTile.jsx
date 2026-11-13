@@ -3,13 +3,14 @@ import Logo from './Logo'
 import { OUTCOME_LABELS, formatDate, getOutcome, hasResult } from '../utils/matchUtils'
 
 // Tarjeta vertical para el carrusel del inicio. Al tocarla se edita el partido.
-// La parte de arriba es un bloque de color que más adelante será una foto.
-function MatchTile({ match, onOpen }) {
+// Lleva una foto de fondo con una capa del color del resultado
+// (rojo victoria, gris empate, negro derrota).
+function MatchTile({ match, photo, onOpen }) {
   const outcome = getOutcome(match)
 
   return (
     <button className={`match-tile tile-${outcome || match.status}`} onClick={() => onOpen(match)}>
-      <div className="tile-media img-ph" aria-hidden="true" />
+      <div className="tile-media" style={{ backgroundImage: `url(${photo})` }} aria-hidden="true" />
       <div className="tile-top">
         <span className="tile-logo">
           <Logo size={24} />
