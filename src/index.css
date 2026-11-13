@@ -774,7 +774,7 @@ code {
   inset: 0;
   background:
     linear-gradient(90deg, rgba(23, 23, 23, 0.92) 0%, rgba(23, 23, 23, 0.55) 55%, rgba(23, 23, 23, 0.2) 100%),
-    url('/images/festejo-jugadores.webp') center / cover;
+    url('/images/bandera-tribuna.webp') center / cover;
 }
 
 .promo-content {
