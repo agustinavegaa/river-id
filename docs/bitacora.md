@@ -163,7 +163,7 @@ Se subió el código a GitHub (https://github.com/agustinavegaa/river-id), se im
 | 6. Validaciones, carga, éxito/error, responsive | Hecho y probado (con servicios simulados) |
 | 7. Reglas de Firestore | Publicadas; acceso sin login rechazado |
 | Bitácora e informe | En curso (este documento) |
-| Iteraciones | V1, V2, V3 y V4 publicadas |
+| Iteraciones | V1, V2, V3, V4 y versión final (V5) |
 
 ### Capturas
 
@@ -516,3 +516,75 @@ Pedido: *"cambiar: agregá a tu viejo por (Agregá a tu familia, a tus amigos o 
 - Las fotos se reparten en orden en el carrusel, así dos tarjetas seguidas nunca tienen la misma. **No son fotos de cada partido real**: son imágenes de ambiente. (Para la V5 se podría dejar que cada hincha elija o suba la foto de su partido.)
 - Se mantuvo la decisión de V2 de diferenciar por resultado: sobre la foto va una capa de color de abajo hacia arriba (rojo victoria, gris empate, negro derrota), que además hace legible el texto.
 - Pruebas (datos de ejemplo): 5 tarjetas con 5 fotos distintas y su color correcto (Boca 2–1 rojo, Palmeiras 0–1 negro, Racing 1–1 gris con la foto del estadio de noche…). Celular 375 px sin scroll horizontal. Una captura automática salió en blanco en celular: al revisar la página, las tarjetas estaban visibles; era la captura desactualizada (ya había pasado en V3).
+
+
+---
+
+## Versión final (V5) — Interacciones
+
+**Fecha:** 12/11/2026 · **Rama:** `version-5`
+
+Pedido: *"hagamos la versión final con interacciones: animaciones suaves al aparecer las tarjetas y al cambiar de pantalla; que los números de las estadísticas cuenten hasta su valor; una pequeña celebración (confeti rojo y blanco) al cargar una victoria; marcar favorito con una animación de la estrella"*.
+
+Todas las animaciones están hechas con CSS y React, **sin librerías nuevas**.
+
+### Qué se agregó y por qué
+
+| Interacción | Cómo funciona | Motivo |
+| --- | --- | --- |
+| **Cambio de pantalla** | La pantalla nueva aparece con un fundido de 0,35 s (`.page-enter`). Se usa `key={currentPage}` para que React la vuelva a montar al navegar. | Que el cambio se sienta fluido y no un salto brusco. |
+| **Tarjetas que aparecen** | Partidos, carrusel, estadísticas, accesos rápidos, datos curiosos y compañeros suben un poco y aparecen una detrás de otra (retraso escalonado). | Guía la mirada y da sensación de orden. |
+| **Números que cuentan** | Componente nuevo `CountUp`: cuenta de 0 al valor en 0,9 s con `requestAnimationFrame`, frenando al final. Empieza **recién cuando el número aparece en pantalla** (`IntersectionObserver`). | Si contaba al cargar, el banner "Tu récord" (al final del Inicio) ya había terminado antes de que el usuario llegara. |
+| **Confeti de victoria** | Componente nuevo `Confetti`: 90 papelitos rojos y blancos con posición, tamaño, giro y velocidad al azar; se van solos a los 3,5 s. El mensaje cambia a "¡Victoria! …". | Celebrar el momento más lindo del hincha. |
+| **Estrella de favorito** | Al pasar a favorito, la estrella crece, gira y vuelve, con un anillo rojo que se expande. | Confirmación visual clara de la acción. |
+| **Botones** | Se "hunden" un poco al apretarlos; los accesos rápidos se levantan al pasar el mouse. | Respuesta inmediata al tocar. |
+| **Accesibilidad** | Si el sistema tiene activado "reducir movimiento", se apagan las animaciones y el confeti; los números se muestran directo. | Hay personas a las que el movimiento les molesta o marea. |
+
+### Decisiones para no "mentir" con las animaciones
+
+- El confeti y la estrella se activan **después de que Firestore confirmó** el guardado, no al tocar el botón. Si Firebase falla, no hay festejo.
+- El confeti sale solo cuando el partido **pasa a ser** una victoria a la que fuiste: nueva victoria, o un partido que antes no era victoria. Editar el comentario de una victoria que ya existía no festeja de nuevo.
+- La estrella anima al **marcar** favorito, no al quitarlo ni al cargar la página.
+
+### Componentes y archivos
+
+- Nuevos: `src/components/CountUp.jsx`, `src/components/Confetti.jsx`, `src/utils/motion.js`.
+- Modificados: `App.jsx` (transición de pantalla y confeti), `MatchCard.jsx` (estrella), `StatCard.jsx`, `ResultsChart.jsx`, `StatsPage.jsx`, `HomePage.jsx` (números que cuentan), `index.css`.
+
+### Dificultades y soluciones
+
+| Dificultad | Solución |
+| --- | --- |
+| Con la animación de entrada en modo `both`, las tarjetas quedaban "congeladas" al terminar y dejaba de funcionar el efecto de levantarse al pasar el mouse. | Se usó `backwards`: aplica el estado inicial durante el retraso y después libera la tarjeta. |
+| El banner "Tu récord" contaba al cargar el Inicio, cuando todavía no se veía. | `CountUp` espera a que el número entre en pantalla. |
+| Al medir el conteo, el banner saltaba de "00" al valor final sin pasos intermedios. | El panel del navegador de prueba estaba oculto y el navegador frena las animaciones de páginas en segundo plano. Con el panel visible se midió el conteo real (ver pruebas). |
+| El confeti no debía festejar cada edición de una victoria. | Se compara el partido antes y después de guardar (`isNewWin`). |
+
+### Pruebas realizadas
+
+**Con datos de ejemplo (panel del navegador visible):**
+
+- [x] Al cambiar de pantalla corren las animaciones `fade-in` y `rise-in`.
+- [x] Estadísticas: los números llegan a los valores correctos (5 asistidos, 2 G, 2 E, 1 P, 40 %, centro del gráfico 5).
+- [x] Banner "Tu récord": en "00 00 0%" hasta que se baja; después cuenta: 00 → 02 → 03 → 04 → 05 y 13 % → 24 % → 31 % → 36 % → 38 % → 40 %, en menos de 1 segundo.
+- [x] Victoria nueva (3–0) → confeti con 90 papelitos rojos y blancos, mensaje "¡Victoria! Partido guardado en tu historial."; a los 4 s el confeti ya no está.
+- [x] Derrota nueva (0–2) → sin confeti. Editar el comentario de la victoria → sin confeti ("Partido actualizado.").
+- [x] Victoria que Firebase no guarda (falla simulada) → sin confeti, mensaje "No hay conexión…" y el formulario queda abierto.
+- [x] Marcar favorito → aparece la animación de la estrella, se quita sola al terminar y el partido queda favorito. Quitar favorito → sin animación.
+- [x] Con "reducir movimiento" simulado → victoria sin confeti (el mensaje "¡Victoria!" sí aparece).
+
+**Con Firebase real (local):**
+
+- [x] Victoria "PRUEBA V5" 2–0 → confeti y "¡Victoria!…" después del guardado; aparece la tarjeta en el carrusel.
+- [x] Favorito → animación de la estrella y queda favorito.
+- [x] Eliminar con confirmación → al recargar, base vacía. Consola sin errores.
+- `npm run build` compila.
+
+### Capturas / video recomendados
+
+1. Grabar en video (las animaciones no se ven en una captura): cambio de pantalla, tarjetas apareciendo, conteo del banner al bajar, confeti al guardar una victoria y la estrella.
+2. Captura del confeti en pleno festejo.
+
+### Pendiente
+
+- [ ] Publicar la versión final en Vercel (unir `version-5` con `main`) y probarla en la URL.

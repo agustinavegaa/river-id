@@ -2052,6 +2052,168 @@ code {
   accent-color: var(--red);
 }
 
+/* ---------- Interacciones (versión final) ---------- */
+
+/* Cambio de pantalla: la pantalla nueva aparece con un fundido suave */
+.page-enter {
+  animation: fade-in 0.35s ease-out;
+}
+
+/* Tarjetas: aparecen subiendo un poco, una detrás de otra */
+.match-card,
+.match-tile,
+.stat-card,
+.quick-action,
+.curiosity,
+.companion,
+.stats-hero,
+.chart-card {
+  /* "backwards": aplica el estado inicial durante el retraso y después
+     libera la tarjeta, así siguen funcionando los efectos al pasar el mouse */
+  animation: rise-in 0.45s ease-out backwards;
+}
+
+/* Retraso escalonado para las primeras tarjetas de cada lista */
+:is(.match-grid, .carousel, .stat-grid, .quick-actions, .curiosities, .companion-list) > :nth-child(2) {
+  animation-delay: 0.06s;
+}
+:is(.match-grid, .carousel, .stat-grid, .quick-actions, .curiosities, .companion-list) > :nth-child(3) {
+  animation-delay: 0.12s;
+}
+:is(.match-grid, .carousel, .stat-grid, .quick-actions, .curiosities, .companion-list) > :nth-child(4) {
+  animation-delay: 0.18s;
+}
+:is(.match-grid, .carousel, .stat-grid, .quick-actions, .curiosities, .companion-list) > :nth-child(n + 5) {
+  animation-delay: 0.24s;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Los botones se "hunden" un poco al apretarlos */
+.btn:active:not(:disabled),
+.btn-pill:active,
+.btn-circle:active,
+.btn-avatar:active,
+.quick-action:active {
+  transform: scale(0.96);
+}
+
+.quick-action {
+  transition: transform 0.15s, border-color 0.15s, background 0.15s;
+}
+
+.quick-action:hover {
+  transform: translateY(-2px);
+}
+
+/* Estrella de favorito: "pop" con un destello alrededor */
+.favorite-btn {
+  position: relative;
+}
+
+.favorite-btn.star-pop svg {
+  animation: star-pop 0.5s ease-out;
+}
+
+.favorite-btn.star-pop::after {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  border: 2px solid var(--red);
+  animation: star-ring 0.5s ease-out forwards;
+  pointer-events: none;
+}
+
+@keyframes star-pop {
+  0% {
+    transform: scale(1);
+  }
+  35% {
+    transform: scale(1.45) rotate(-12deg);
+  }
+  65% {
+    transform: scale(0.9) rotate(6deg);
+  }
+  100% {
+    transform: scale(1) rotate(0);
+  }
+}
+
+@keyframes star-ring {
+  from {
+    transform: scale(0.6);
+    opacity: 1;
+  }
+  to {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+}
+
+/* Confeti de victoria */
+.confetti {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.confetti-piece {
+  position: absolute;
+  top: -20px;
+  border-radius: 2px;
+  animation-name: confetti-fall;
+  animation-timing-function: cubic-bezier(0.25, 0.6, 0.5, 1);
+  animation-fill-mode: forwards;
+}
+
+.confetti-piece.red {
+  background: var(--red);
+}
+
+.confetti-piece.white {
+  background: var(--white);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.12);
+}
+
+@keyframes confetti-fall {
+  to {
+    transform: translate(var(--drift), 105vh) rotate(var(--spin));
+    opacity: 0.9;
+  }
+}
+
+/* Si el sistema pide menos movimiento, apagamos las animaciones */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0s !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 /* ---------- Responsive ---------- */
 
 @media (max-width: 1280px) {

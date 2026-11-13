@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react'
 import { CalendarDays, MapPin, MessageSquareQuote, Pencil, Star, Trash2, Trophy, Users } from 'lucide-react'
 import {
   OUTCOME_LABELS,
@@ -21,12 +22,22 @@ function MatchCard({ match, busy, onEdit, onDelete, onToggleFavorite, onChangeSt
   // Los botones de asistencia solo aparecen desde el día del partido.
   const showAttendance = isUpcoming && onChangeStatus && canMarkAttendance(match)
 
+  // Animación de la estrella: se activa cuando el partido PASA a ser favorito
+  // (después de que Firestore lo guardó), no al cargar la página.
+  const [starPop, setStarPop] = useState(false)
+  const wasFavorite = useRef(match.favorite)
+  useEffect(() => {
+    if (match.favorite && !wasFavorite.current) setStarPop(true)
+    wasFavorite.current = match.favorite
+  }, [match.favorite])
+
   return (
     <article className={`match-card ${busy ? 'is-busy' : ''} ${isPast ? 'is-past' : ''}`}>
       <div className="match-card-top">
         <span className={`badge badge-${match.status}`}>{STATUS_LABELS[match.status]}</span>
         <button
-          className={`icon-btn favorite-btn ${match.favorite ? 'is-favorite' : ''}`}
+          className={`icon-btn favorite-btn ${match.favorite ? 'is-favorite' : ''} ${starPop ? 'star-pop' : ''}`}
+          onAnimationEnd={() => setStarPop(false)}
           onClick={() => onToggleFavorite(match)}
           disabled={busy}
           aria-label={match.favorite ? 'Quitar de favoritos' : 'Marcar como favorito'}

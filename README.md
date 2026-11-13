@@ -17,13 +17,14 @@ Aplicación web para hinchas de River Plate: un **diario digital del hincha** do
 El escudo y las fotos de `public/images/` pertenecen al Club Atlético River Plate y a sus autores; se usan solo con fines educativos.
 - Vercel (despliegue)
 
-## Funcionalidades (versión 4)
+## Funcionalidades (versión final)
 
 - **Inicio:** portada con cuenta regresiva al próximo partido (si no tiene hora, solo los días), accesos rápidos, carrusel de partidos a los que fuiste, sección "Sobre River ID" y banner con tu récord.
 - **Mis partidos:** agregar, consultar, editar y eliminar partidos; favoritos; comentario personal; búsqueda por rival; filtros por estado, resultado y competición; orden por fecha.
 - **Próximos:** "¿Fuiste?" (partidos ya jugados) y "Se vienen" (en orden de fecha y hora); "Asistí" abre el formulario para cargar el resultado.
 - **Estadísticas:** porcentaje de victorias, gráfico de resultados, partidos asistidos, victorias, empates, derrotas, favoritos y datos curiosos.
 - **Formulario:** validaciones con mensajes específicos, aviso de duplicados y bloqueo de doble envío.
+- **Interacciones:** las pantallas y las tarjetas aparecen con una animación suave, los números de las estadísticas "cuentan" hasta su valor, sale confeti rojo y blanco al cargar una victoria y la estrella de favorito hace un "pop". Si el sistema pide reducir el movimiento, las animaciones se desactivan.
 - **Mi perfil:** tu nombre (la app te saluda) y tu **grupo de cancha**: las personas con las que vas. En cada partido marcás con quién fuiste y en Estadísticas aparece "Con quién fuiste más".
 
 ## Instalación y ejecución local

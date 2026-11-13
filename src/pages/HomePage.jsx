@@ -1,6 +1,7 @@
 import { ArrowRight, BarChart3, CalendarClock, MapPin, Plus, Ticket } from 'lucide-react'
 import Carousel from '../components/Carousel'
 import Countdown from '../components/Countdown'
+import CountUp from '../components/CountUp'
 import EmptyState from '../components/EmptyState'
 import { STATUS, calculateStats, formatDate, formatTime, getNextMatch, isPastUpcoming, sortByDate } from '../utils/matchUtils'
 
@@ -171,15 +172,21 @@ function HomePage({ matches, actions, onNavigate, profile }) {
           </div>
           <div className="promo-panel">
             <div>
-              <strong className="display">{String(stats.attended).padStart(2, '0')}</strong>
+              <strong className="display">
+                <CountUp value={stats.attended} pad={2} />
+              </strong>
               <span>Partidos</span>
             </div>
             <div>
-              <strong className="display">{String(stats.wins).padStart(2, '0')}</strong>
+              <strong className="display">
+                <CountUp value={stats.wins} pad={2} />
+              </strong>
               <span>Victorias</span>
             </div>
             <div>
-              <strong className="display">{stats.winRate}%</strong>
+              <strong className="display">
+                <CountUp value={stats.winRate} suffix="%" />
+              </strong>
               <span>De victorias</span>
             </div>
           </div>

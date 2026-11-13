@@ -1,3 +1,5 @@
+import CountUp from './CountUp'
+
 // Gráfico de anillo con victorias, empates y derrotas.
 // Se dibuja solo con CSS (conic-gradient), sin librerías externas.
 function ResultsChart({ wins, draws, losses }) {
@@ -28,7 +30,9 @@ function ResultsChart({ wins, draws, losses }) {
         aria-label={`${wins} victorias, ${draws} empates y ${losses} derrotas`}
       >
         <div className="donut-center">
-          <strong className="display">{total}</strong>
+          <strong className="display">
+            <CountUp value={total} />
+          </strong>
           <span>{total === 1 ? 'partido' : 'partidos'}</span>
         </div>
       </div>

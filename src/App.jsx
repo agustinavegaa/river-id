@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import ConfirmDialog from './components/ConfirmDialog'
+import Confetti from './components/Confetti'
 import Loader from './components/Loader'
 import Logo from './components/Logo'
 import Header from './components/Header'
@@ -17,7 +18,8 @@ import { listenToUser } from './services/authService'
 import { addMatch, deleteMatch, getMatches, updateMatch } from './services/matchesService'
 import { getProfile, saveProfile } from './services/profileService'
 import { getErrorMessage, offlineError } from './utils/errors'
-import { STATUS, STATUS_LABELS } from './utils/matchUtils'
+import { STATUS, STATUS_LABELS, getOutcome } from './utils/matchUtils'
+import { prefersReducedMotion } from './utils/motion'
 
 // Recordamos en el navegador si el usuario salteó la bienvenida (solo comodidad;
 // los datos reales del perfil se guardan en Firestore).
@@ -49,6 +51,8 @@ function App() {
   const [profileLoaded, setProfileLoaded] = useState(false)
   const [profileError, setProfileError] = useState('')
   const [welcomeSkipped, setWelcomeSkipped] = useState(() => readWelcomeSkipped())
+  // Confeti al cargar una victoria (versión final)
+  const [celebrating, setCelebrating] = useState(false)
 
   // 1. Al iniciar, Firebase Authentication nos da un usuario anónimo.
   useEffect(() => {
@@ -76,6 +80,13 @@ function App() {
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [currentPage])
+
+  // El confeti se va solo a los 3,5 segundos.
+  useEffect(() => {
+    if (!celebrating) return
+    const timer = setTimeout(() => setCelebrating(false), 3500)
+    return () => clearTimeout(timer)
+  }, [celebrating])
 
   // Los mensajes desaparecen solos después de unos segundos.
   useEffect(() => {
@@ -147,17 +158,28 @@ function App() {
     if (!navigator.onLine) throw offlineError()
   }
 
+  // ¿Hay que festejar? Solo si queda guardada una victoria a la que fue
+  // y antes no lo era (así no festeja cada vez que edita el comentario).
+  function isNewWin(data, previous) {
+    const isWin = data.status === STATUS.ATTENDED && getOutcome(data) === 'victoria'
+    const wasWin = previous && previous.status === STATUS.ATTENDED && getOutcome(previous) === 'victoria'
+    return isWin && !wasWin
+  }
+
   // Crear o editar. Devuelve true si se guardó, false si falló.
   async function handleSave(data) {
+    const celebrate = isNewWin(data, form.match)
     try {
       checkOnline()
       if (form.match) {
         await updateMatch(form.match.id, data)
-        showToast('Partido actualizado.')
+        showToast(celebrate ? '¡Victoria! Partido actualizado.' : 'Partido actualizado.')
       } else {
         await addMatch(user.uid, data)
-        showToast('Partido guardado en tu historial.')
+        showToast(celebrate ? '¡Victoria! Partido guardado en tu historial.' : 'Partido guardado en tu historial.')
       }
+      // El confeti sale recién después de que Firestore confirmó el guardado.
+      if (celebrate && !prefersReducedMotion()) setCelebrating(true)
       // Volvemos a leer de Firestore para mostrar lo que realmente quedó guardado.
       await loadMatches(user.uid)
       setForm(null)
@@ -280,7 +302,11 @@ function App() {
             </div>
           </>
         ) : (
-          renderPage()
+          // La "key" hace que la pantalla se vuelva a montar al navegar,
+          // así se repite la animación de entrada (ver .page-enter en index.css).
+          <div key={currentPage} className="page-enter">
+            {renderPage()}
+          </div>
         )}
       </main>
 
@@ -322,6 +348,8 @@ function App() {
           onCancel={() => setMatchToDelete(null)}
         />
       )}
+
+      {celebrating && <Confetti />}
 
       <Toast toast={toast} onClose={() => setToast(null)} />
     </div>

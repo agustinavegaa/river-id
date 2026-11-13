@@ -1,4 +1,5 @@
 import { BarChart3, Equal, ListChecks, MapPin, Star, Swords, ThumbsDown, Ticket, Trophy, Users } from 'lucide-react'
+import CountUp from '../components/CountUp'
 import EmptyState from '../components/EmptyState'
 import PageHeader from '../components/PageHeader'
 import ResultsChart from '../components/ResultsChart'
@@ -66,7 +67,9 @@ function StatsPage({ matches, onNavigate }) {
             <section className="stats-overview">
               <div className="stats-hero">
                 <span>Porcentaje de victorias</span>
-                <strong className="display">{stats.winRate}%</strong>
+                <strong className="display">
+                  <CountUp value={stats.winRate} suffix="%" />
+                </strong>
                 <small>
                   {stats.withResult > 0
                     ? `${stats.wins} de ${plural(stats.withResult)} con resultado`
