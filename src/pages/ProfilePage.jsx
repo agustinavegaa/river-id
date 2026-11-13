@@ -136,7 +136,7 @@ function ProfilePage({ matches, profile, profileError, onSaveProfile, onRetryPro
                 <EmptyState
                   icon={Users}
                   title="Tu grupo está vacío"
-                  message="Agregá a tu viejo, a tus amigos o a quien te acompañe al Monumental."
+                  message="Agregá a tu familia, a tus amigos o a quien te acompañe al Monumental."
                 />
               ) : (
                 <>

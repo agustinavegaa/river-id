@@ -205,3 +205,70 @@ export function getTopCompanion(matches) {
   if (max === 0) return null
   return { names: Object.keys(counts).filter((name) => counts[name] === max), count: max }
 }
+
+// ---------- Sugerencias de rivales ----------
+
+// Lista general de clubes para sugerir al escribir el rival.
+// Son sugerencias para escribir más rápido: no es el fixture oficial de River.
+export const CLUB_SUGGESTIONS = [
+  'Aldosivi',
+  'Argentinos Juniors',
+  'Atlético Tucumán',
+  'Banfield',
+  'Barracas Central',
+  'Belgrano',
+  'Boca Juniors',
+  'Central Córdoba',
+  'Defensa y Justicia',
+  'Deportivo Riestra',
+  'Estudiantes de La Plata',
+  'Estudiantes de Río Cuarto',
+  'Gimnasia y Esgrima La Plata',
+  'Gimnasia y Esgrima de Mendoza',
+  'Godoy Cruz',
+  'Huracán',
+  'Independiente',
+  'Independiente Rivadavia',
+  'Instituto',
+  'Lanús',
+  "Newell's Old Boys",
+  'Platense',
+  'Racing Club',
+  'Rosario Central',
+  'San Lorenzo',
+  'San Martín de San Juan',
+  'Sarmiento',
+  'Talleres',
+  'Tigre',
+  'Unión',
+  'Vélez Sarsfield',
+]
+
+// Arma las sugerencias de rivales a partir del historial del usuario:
+// - thisYear: rivales que cargó este año, del más repetido al menos.
+// - all: thisYear + el resto de su historial + la lista general (sin repetir).
+export function getRivalSuggestions(matches) {
+  const year = todayString().slice(0, 4)
+  // Contamos por nombre normalizado ("boca juniors" = "Boca Juniors")
+  // y mostramos cómo lo escribió la última vez.
+  const countThisYear = {}
+  const historyNames = []
+
+  sortByDate(matches).forEach((m) => {
+    const key = normalizeName(m.rival)
+    if (m.date.startsWith(year)) {
+      if (!countThisYear[key]) countThisYear[key] = { name: m.rival, count: 0 }
+      countThisYear[key].count += 1
+    }
+    if (!historyNames.some((name) => normalizeName(name) === key)) historyNames.push(m.rival)
+  })
+
+  const thisYear = Object.values(countThisYear).sort((a, b) => b.count - a.count)
+
+  const all = []
+  ;[...thisYear.map((r) => r.name), ...historyNames, ...CLUB_SUGGESTIONS].forEach((name) => {
+    if (!all.some((n) => normalizeName(n) === normalizeName(name))) all.push(name)
+  })
+
+  return { year, thisYear, all }
+}

@@ -1,6 +1,14 @@
 import { useRef, useState } from 'react'
 import Modal from './Modal'
-import { COMPETITIONS, STATUS, STATUS_LABELS, formatDate, normalizeName, todayString } from '../utils/matchUtils'
+import {
+  COMPETITIONS,
+  STATUS,
+  STATUS_LABELS,
+  formatDate,
+  getRivalSuggestions,
+  normalizeName,
+  todayString,
+} from '../utils/matchUtils'
 
 const MAX_RIVAL = 40
 const MAX_GOALS = 30
@@ -101,6 +109,8 @@ function MatchForm({ match, defaults, matches, companions, onSave, onClose, onOp
   const submittingRef = useRef(false)
 
   const isUpcoming = values.status === STATUS.UPCOMING
+  // Sugerencias de rivales según lo que el usuario ya cargó (primero este año).
+  const rivals = getRivalSuggestions(matches)
   // Opciones: el grupo actual + quienes ya estaban marcados en este partido
   // (por si después los sacó del grupo, no se pierden).
   const companionOptions = [...companions, ...values.companions.filter((c) => !companions.includes(c))]
@@ -186,9 +196,35 @@ function MatchForm({ match, defaults, matches, companions, onSave, onClose, onOp
               maxLength={MAX_RIVAL}
               aria-invalid={Boolean(errors.rival)}
               autoFocus={!isEditing}
+              list="rival-suggestions"
+              autoComplete="off"
             />
+            {/* Al escribir, el navegador muestra estas sugerencias */}
+            <datalist id="rival-suggestions">
+              {rivals.all.map((name) => (
+                <option key={name} value={name} />
+              ))}
+            </datalist>
             {errors.rival && <small className="field-error">{errors.rival}</small>}
           </label>
+
+          {/* Atajos: los rivales que más cargó este año (solo con el campo vacío) */}
+          {!values.rival && rivals.thisYear.length > 0 && (
+            <div className="rival-shortcuts">
+              <span>Tus rivales de {rivals.year}:</span>
+              {rivals.thisYear.slice(0, 5).map((r) => (
+                <button
+                  type="button"
+                  key={r.name}
+                  className="pick-chip"
+                  onClick={() => setValues((prev) => ({ ...prev, rival: r.name }))}
+                >
+                  {r.name}
+                  {r.count > 1 && <small className="chip-times">×{r.count}</small>}
+                </button>
+              ))}
+            </div>
+          )}
 
           <div className="form-row">
             <label className="field">

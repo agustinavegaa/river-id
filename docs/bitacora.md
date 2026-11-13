@@ -489,3 +489,21 @@ En https://river-id-ez6q.vercel.app:
 4. Formulario con "¿Con quién fuiste?".
 5. Tarjeta con "Con Papá y Juli" y Estadísticas con "Con quién fuiste más".
 6. Firebase Console → Reglas con el bloque `profiles`, y → Datos con un documento de `profiles`.
+
+### Ajustes posteriores a la V4 (12/11/2026)
+
+Pedido: *"cambiar: agregá a tu viejo por (Agregá a tu familia, a tus amigos o a quien te acompañe al Monumental) · recomendación de rivales al escribir y si se puede tener en cuenta el historial de River este año"*.
+
+- [x] **Texto del grupo vacío**: "Agregá a tu familia, a tus amigos o a quien te acompañe al Monumental." (antes decía "a tu viejo").
+- [x] **Sugerencias de rivales al escribir**: el campo Rival muestra una lista que el navegador filtra mientras escribís (`<datalist>`, sin librerías). El orden es:
+  1. Los rivales que cargaste **este año**, del más repetido al menos.
+  2. El resto de tu historial.
+  3. Una lista general de clubes argentinos (para escribir más rápido; no es el fixture oficial).
+  No se repiten nombres aunque estén escritos distinto ("boca juniors" = "Boca Juniors").
+- [x] **Atajos "Tus rivales de 2026"**: con el campo vacío aparecen hasta 5 botones con los rivales que más cargaste este año (con "×2" si se repite). Al tocar uno, se completa el rival.
+
+**Sobre "el historial de River este año"**: se tomó como el historial que el hincha cargó en la app este año. No se usa el fixture oficial de River porque la consigna de V1 dejó afuera las APIs de resultados y porque no se pueden inventar datos de partidos reales.
+
+**Dificultad**: al probar con Node, "Boca Juniors" y "boca juniors" se contaban como dos rivales distintos en "este año". Se corrigió contando por nombre normalizado y mostrando cómo se escribió la última vez.
+
+**Pruebas**: con Node, 5 partidos (3 de Boca escritos de dos formas, 1 de Racing en 2026 y 1 de Palmeiras en 2025) → "este año: Boca Juniors ×3, Racing Club ×1"; la lista arranca con Boca, Racing y Palmeiras y Boca aparece una sola vez. En el navegador (datos de ejemplo): atajos "Boca Juniors ×2, San Lorenzo, Rosario Central, Independiente, Talleres"; tocar "Boca Juniors" completa el campo y oculta los atajos; el campo tiene la lista de sugerencias conectada. El desplegable lo dibuja el navegador y no aparece en las capturas automáticas, así que conviene sacarle una captura a mano.

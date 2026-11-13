@@ -1688,6 +1688,37 @@ code {
   color: var(--gray-text);
 }
 
+/* Atajos de rivales en el formulario */
+.rival-shortcuts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: -6px;
+}
+
+.rival-shortcuts > span {
+  font-size: 0.8rem;
+  color: var(--gray-text);
+}
+
+.rival-shortcuts .pick-chip {
+  background: var(--white);
+  padding: 6px 12px;
+  font-size: 0.85rem;
+}
+
+.rival-shortcuts .pick-chip:hover {
+  border-color: var(--red);
+  color: var(--red);
+}
+
+.chip-times {
+  margin-left: 6px;
+  color: var(--gray-text);
+  font-weight: 600;
+}
+
 /* Selector de compañeros en el formulario */
 .companion-picker {
   display: flex;
