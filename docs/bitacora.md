@@ -163,7 +163,7 @@ Se subió el código a GitHub (https://github.com/agustinavegaa/river-id), se im
 | 6. Validaciones, carga, éxito/error, responsive | Hecho y probado (con servicios simulados) |
 | 7. Reglas de Firestore | Publicadas; acceso sin login rechazado |
 | Bitácora e informe | En curso (este documento) |
-| Iteraciones | V1, V2, V3, V4 y versión final (V5) |
+| Iteraciones | V1, V2, V3, V4 y versión final (V5), todas publicadas |
 
 ### Capturas
 
@@ -585,6 +585,12 @@ Todas las animaciones están hechas con CSS y React, **sin librerías nuevas**.
 1. Grabar en video (las animaciones no se ven en una captura): cambio de pantalla, tarjetas apareciendo, conteo del banner al bajar, confeti al guardar una victoria y la estrella.
 2. Captura del confeti en pleno festejo.
 
-### Pendiente
+### Publicación en Vercel (13/11/2026)
 
-- [ ] Publicar la versión final en Vercel (unir `version-5` con `main`) y probarla en la URL.
+Se unió `version-5` con `main`; Vercel publicó la versión final sola. En https://river-id-ez6q.vercel.app (con el panel del navegador visible):
+
+- [x] Victoria "PRUEBA Final" 3–1 → confeti y "¡Victoria! Partido guardado en tu historial."
+- [x] Banner "Tu récord" al bajar: 00 00 38 % → 01 01 67 % → … → 01 01 100 %.
+- [x] Al cambiar de pantalla corren `fade-in` y `rise-in`.
+- [x] Marcar favorito → animación de la estrella.
+- [x] Eliminar con confirmación → base vacía. Consola sin errores.
