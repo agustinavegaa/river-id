@@ -638,3 +638,11 @@ Se cargaron 6 partidos "PRUEBA" y se borraron al terminar:
 - [x] Ciudad inexistente → "No encontramos la ciudad…".
 - [x] Falla de la API (simulada) → "No pudimos cargar el clima. Reintentar"; al reintentar con la API funcionando, aparece el clima.
 - [x] Celular (375 px): sin scroll horizontal. Consola sin errores. `npm run build` compila.
+
+### Publicación en Vercel (23/11/2026)
+
+Se unió `version-6` con `main`; Vercel publicó la versión sola. En https://river-id-ez6q.vercel.app:
+
+- [x] Próximo "PRUEBA V6" en Córdoba, en 3 días, 19:00 → "Pronóstico: Nublado · 23° a las 19:00 h · Máx 25° · Mín 14° · Lluvia 8% · Córdoba".
+- [x] Al recargar, el partido (con su ciudad) y el clima siguen ahí.
+- [x] Eliminar con confirmación → el partido desaparece. Consola sin errores.
