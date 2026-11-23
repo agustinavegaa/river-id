@@ -3,6 +3,7 @@ import Carousel from '../components/Carousel'
 import Countdown from '../components/Countdown'
 import CountUp from '../components/CountUp'
 import EmptyState from '../components/EmptyState'
+import LastRiverMatch from '../components/LastRiverMatch'
 import WeatherInfo from '../components/WeatherInfo'
 import { STATUS, calculateStats, formatDate, formatTime, getNextMatch, isPastUpcoming, sortByDate } from '../utils/matchUtils'
 
@@ -123,6 +124,9 @@ function HomePage({ matches, actions, onNavigate, profile }) {
             }
           />
         )}
+
+        {/* ---------- Último partido de River (API externa TheSportsDB) ---------- */}
+        <LastRiverMatch matches={matches} onAdd={actions.onAdd} />
 
         <hr className="curve-divider" />
 

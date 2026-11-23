@@ -646,3 +646,38 @@ Se unió `version-6` con `main`; Vercel publicó la versión sola. En https://ri
 - [x] Próximo "PRUEBA V6" en Córdoba, en 3 días, 19:00 → "Pronóstico: Nublado · 23° a las 19:00 h · Máx 25° · Mín 14° · Lluvia 8% · Córdoba".
 - [x] Al recargar, el partido (con su ciudad) y el clima siguen ahí.
 - [x] Eliminar con confirmación → el partido desaparece. Consola sin errores.
+
+---
+
+## Versión 7 — Último partido de River con TheSportsDB
+
+### Investigación previa (23/11/2026)
+
+- **API-Football:** su sitio bloqueó la lectura automática de precios y documentación, así que no se pudo confirmar si el plan gratis cubre la temporada 2026 y la Liga Argentina. Además requiere una clave privada, que obligaría a armar una función intermedia en Vercel. Se descartó.
+- **TheSportsDB:** se probó directamente.
+  - Encuentra a River Plate (id 135171) y acepta llamadas desde el navegador.
+  - La clave de prueba "123" es gratuita y pública, así que no hay nada secreto. La vieja clave "3" ya está desactivada.
+  - Límites del plan gratis (documentación oficial y pruebas): 30 consultas por minuto (al pasarse responde error 429 y hay que esperar); "últimos partidos" trae 1 solo resultado y solo de local; partidos del día, máximo 3; búsqueda de partidos, 1. Por eso **no sirve para completar automáticamente cualquier partido**.
+  - Las condiciones piden nombrar a TheSportsDB como fuente, y advierten que las imágenes con licencia dudosa no se usen en sitios públicos, así que no se muestran escudos.
+
+### Decisión
+
+Una tarjeta **"Último partido de River"** en el Inicio, con un botón **"¿Fuiste? Cargalo"** que abre el formulario ya completo. Hace una sola consulta y la recuerda en memoria mientras la app está abierta, para no pasarse del límite.
+
+- La fecha y la hora se toman en horario de Argentina (la API también las trae en UTC: 22:00 UTC = 19:00).
+- La competición de la API se traduce a las opciones del formulario ("Argentinian Primera Division" → "Liga Profesional"). Si no se reconoce, queda vacía en lugar de inventarla.
+- Si el partido ya está en el historial (mismo rival y fecha), dice "Ya está en tu historial".
+- Estados: cargando, sin conexión, límite de consultas ("Probá de nuevo en un minuto"), error con "Reintentar" y sin datos.
+
+### Archivos
+
+- `src/services/footballService.js` y `src/components/LastRiverMatch.jsx` (nuevos).
+- `HomePage.jsx` e `index.css`.
+
+### Pruebas realizadas (Firebase real, local)
+
+- [x] La tarjeta muestra "River 3 – 1 Lanús · Victoria · dom, 22 nov 2026 · 19:00 h · Liga Profesional · Estadio Mâs Monumental · Datos de TheSportsDB".
+- [x] "¿Fuiste? Cargalo" → formulario "Agregar partido" con rival Lanús, fecha 2026-11-22, hora 19:00, Liga Profesional, el estadio, 3–1 y "Asistí". Al guardar, Firestore tiene esos mismos datos y la tarjeta pasa a "Ya está en tu historial". El partido se borró al terminar.
+- [x] Respuesta 429 simulada → error "football-limit" (mensaje de "probá en un minuto").
+- [x] Sin conexión simulada → "Sin conexión: no pudimos traer el último partido." y "Reintentar"; al reintentar con conexión vuelve la tarjeta.
+- [x] Celular (375 px): sin scroll horizontal. Consola sin errores. `npm run build` compila.

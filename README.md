@@ -12,6 +12,7 @@ Aplicación web para hinchas de River Plate: un **diario digital del hincha** do
 - [React](https://react.dev/) + [Vite](https://vite.dev/)
 - [Firebase](https://firebase.google.com/): Cloud Firestore (base de datos) y Authentication anónima
 - [Open-Meteo](https://open-meteo.com/) (API externa de clima, gratuita y sin clave)
+- [TheSportsDB](https://www.thesportsdb.com/) (API externa de fútbol; se usa su clave de prueba gratuita y pública "123")
 - [Lucide React](https://lucide.dev/) (íconos)
 - Google Fonts: Anton (títulos) e Inter (textos)
 
@@ -27,6 +28,7 @@ El escudo y las fotos de `public/images/` pertenecen al Club Atlético River Pla
 - **Formulario:** validaciones con mensajes específicos, aviso de duplicados y bloqueo de doble envío.
 - **Interacciones:** las pantallas y las tarjetas aparecen con una animación suave, los números de las estadísticas "cuentan" hasta su valor, sale confeti rojo y blanco al cargar una victoria y la estrella de favorito hace un "pop". Si el sistema pide reducir el movimiento, las animaciones se desactivan.
 - **Clima del partido (API externa):** cada tarjeta muestra el pronóstico (hasta 16 días antes) o el clima que hizo ese día, con la temperatura a la hora del partido si tiene hora. En la portada aparece el pronóstico del próximo partido. Se usa la ciudad del partido o, si se juega en el Monumental, el Monumental.
+- **Último partido de River (API externa):** en el Inicio, una tarjeta con el último partido de River según TheSportsDB. Con "¿Fuiste? Cargalo" se abre el formulario ya completo (rival, fecha, hora, estadio, competición y resultado). Si ya está en tu historial, lo avisa. Límite del plan gratis: solo trae el último partido **de local**.
 - **Mi perfil:** tu nombre (la app te saluda) y tu **grupo de cancha**: las personas con las que vas. En cada partido marcás con quién fuiste y en Estadísticas aparece "Con quién fuiste más".
 
 ## Instalación y ejecución local
@@ -116,7 +118,8 @@ src/
 │   ├── authService.js      # Inicio de sesión anónimo
 │   ├── matchesService.js   # CRUD de partidos en Firestore
 │   ├── profileService.js   # Perfil y grupo de cancha
-│   └── weatherService.js   # Clima con la API de Open-Meteo
+│   ├── weatherService.js   # Clima con la API de Open-Meteo
+│   └── footballService.js  # Último partido de River con la API de TheSportsDB
 ├── utils/
 │   └── matchUtils.js       # Estados, formato de fechas y cálculo de estadísticas
 ├── components/             # Piezas reutilizables (tarjetas, formulario, modal...)
@@ -135,6 +138,7 @@ src/
 - **Eliminar:** `deleteMatch()` (usa `deleteDoc`)
 - **Perfil:** `getProfile()` y `saveProfile()` en `src/services/profileService.js` (usan `getDoc` y `setDoc`)
 - **Clima (API externa):** `getMatchWeather()` en `src/services/weatherService.js` (usa `fetch` a Open-Meteo) y el componente `src/components/WeatherInfo.jsx`.
+- **Último partido (API externa):** `getLastRiverMatch()` en `src/services/footballService.js` y el componente `src/components/LastRiverMatch.jsx`.
 - Estas funciones se llaman desde `src/App.jsx` (`handleSave`, `handleConfirmDelete`, `quickUpdate`).
 
 ## Despliegue en Vercel

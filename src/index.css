@@ -1214,6 +1214,69 @@ code {
   color: var(--red);
 }
 
+/* ---------- Último partido de River (TheSportsDB) ---------- */
+.api-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 560px;
+  width: 100%;
+  margin: 48px auto 0;
+  padding: 24px;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.api-card-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.api-card-head h2 {
+  margin: 0;
+  font-size: 1.6rem;
+}
+
+.api-card-head small {
+  color: var(--gray-text);
+}
+
+.api-card-head a {
+  color: var(--red);
+}
+
+.api-card .btn {
+  align-self: flex-start;
+}
+
+.api-message {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  color: var(--gray-text);
+}
+
+.api-message p {
+  margin: 0;
+  flex: 1;
+  min-width: 180px;
+}
+
+.api-saved {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  color: var(--win);
+  font-weight: 600;
+}
+
 /* ---------- Clima del partido (Open-Meteo) ---------- */
 .weather {
   display: flex;
