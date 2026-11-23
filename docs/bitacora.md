@@ -681,3 +681,12 @@ Una tarjeta **"Último partido de River"** en el Inicio, con un botón **"¿Fuis
 - [x] Respuesta 429 simulada → error "football-limit" (mensaje de "probá en un minuto").
 - [x] Sin conexión simulada → "Sin conexión: no pudimos traer el último partido." y "Reintentar"; al reintentar con conexión vuelve la tarjeta.
 - [x] Celular (375 px): sin scroll horizontal. Consola sin errores. `npm run build` compila.
+
+### Publicación en Vercel (23/11/2026)
+
+Se unió `version-7` con `main`; Vercel publicó la versión sola. En https://river-id-ez6q.vercel.app:
+
+- [x] La tarjeta muestra "River 3 – 1 Lanús · Victoria · dom, 22 nov 2026 · 19:00 h · Liga Profesional · Estadio Mâs Monumental".
+- [x] "¿Fuiste? Cargalo" → formulario completo (Lanús, 2026-11-22, 19:00, Liga Profesional, 3–1); al guardar, "Ya está en tu historial".
+- [x] Al recargar sigue "Ya está en tu historial", y la tarjeta del partido muestra el clima de las dos APIs juntas: "Ese día: Despejado · 25° a las 19:00 h · Máx 26° · Mín 15° · Monumental".
+- [x] Eliminar con confirmación → el partido desaparece. Consola sin errores.
