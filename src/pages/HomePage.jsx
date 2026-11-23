@@ -3,6 +3,7 @@ import Carousel from '../components/Carousel'
 import Countdown from '../components/Countdown'
 import CountUp from '../components/CountUp'
 import EmptyState from '../components/EmptyState'
+import WeatherInfo from '../components/WeatherInfo'
 import { STATUS, calculateStats, formatDate, formatTime, getNextMatch, isPastUpcoming, sortByDate } from '../utils/matchUtils'
 
 function HomePage({ matches, actions, onNavigate, profile }) {
@@ -48,6 +49,7 @@ function HomePage({ matches, actions, onNavigate, profile }) {
                   {formatDate(nextMatch.date)} · {formatTime(nextMatch)}
                 </strong>
                 <small>{nextMatch.stadium || nextMatch.competition || 'Próximo partido'}</small>
+                <WeatherInfo match={nextMatch} variant="hero" />
               </span>
             </button>
           ) : (

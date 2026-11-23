@@ -594,3 +594,47 @@ Se unió `version-5` con `main`; Vercel publicó la versión final sola. En http
 - [x] Al cambiar de pantalla corren `fade-in` y `rise-in`.
 - [x] Marcar favorito → animación de la estrella.
 - [x] Eliminar con confirmación → base vacía. Consola sin errores.
+
+---
+
+## Versión 6 (final de la materia) — Clima del partido con una API externa
+
+### Idea
+
+Para el final se sumó una **API externa** coherente con la app. Se compararon tres opciones: clima (Open-Meteo), datos de fútbol (API-Football / TheSportsDB) y escudos de rivales. Se eligió **Open-Meteo** porque es gratuita, **no necesita clave** (no hay nada secreto en el frontend, como pide la consigna) y se integra en pantallas que ya existían.
+
+### Investigación previa (pruebas reales a la API, 23/11/2026)
+
+- Pronóstico: responde hasta 15 días después de hoy; una fecha más lejana devuelve error ("out of allowed range").
+- Partidos pasados: el archivo histórico (`archive-api`) devuelve el clima de cualquier fecha vieja; para los días recientes se usa el pronóstico, porque el archivo tarda unos días en completarse.
+- La API permite llamadas desde el navegador (`access-control-allow-origin: *`).
+- El buscador de lugares **no encuentra estadios** ("Monumental", "La Bombonera", "Cilindro" no dan resultados), pero sí ciudades ("Avellaneda", "Córdoba", "La Plata").
+
+### Decisiones (tomadas junto con la IA, antes de programar)
+
+| Decisión | Por qué |
+| --- | --- |
+| Campo opcional **Ciudad** en el formulario. | El buscador no encuentra estadios. Si la ciudad está vacía y el estadio es el Monumental (o no hay estadio), se usa el Monumental. Si no, la tarjeta pide la ciudad en lugar de adivinar. |
+| El clima va en las tarjetas y en la portada. | Pronóstico en los próximos; "Ese día…" en los pasados; una línea corta junto a la cuenta regresiva. |
+| No se modificaron las reglas de Firestore. | El campo `city` se guarda como los demás campos opcionales; las reglas ya controlan dueño, rival y fecha. |
+| El clima no se guarda en Firestore. | Se consulta cada vez; se recuerda en memoria mientras la app está abierta para no repetir llamadas (no se usa localStorage). |
+| Cada caso sin datos tiene su mensaje. | Cargando, sin conexión / error con "Reintentar", partido muy lejano ("faltan X días"), sin ciudad, ciudad no encontrada y sin datos para esa fecha. |
+
+### Archivos
+
+- `src/services/weatherService.js`: busca la ciudad, elige pronóstico o histórico, traduce los códigos de clima a texto e ícono.
+- `src/components/WeatherInfo.jsx`: muestra el clima y los estados de carga y error.
+- `MatchForm.jsx` (campo Ciudad), `MatchCard.jsx`, `HomePage.jsx`, `index.css`.
+
+### Pruebas realizadas (Firebase real, local)
+
+Se cargaron 6 partidos "PRUEBA" y se borraron al terminar:
+
+- [x] Próximo en el Monumental, en 5 días, 21:00 → "Pronóstico: Despejado · 26° a las 21:00 h · Máx 30° · Mín 19° · Lluvia 2%". En la portada: "Despejado · 30° / 19° · Lluvia 2%".
+- [x] Próximo en 40 días → "El pronóstico aparece 16 días antes del partido (faltan 25 días)."
+- [x] Asistido en Avellaneda (4/10/2026, 17:00) → "Ese día: Parcialmente nublado · 22° a las 17:00 h".
+- [x] Asistido en el Monumental (12/5/2024) → "Ese día: Llovizna · Máx 12° · Mín 8° · Llovió 6.4 mm". Comparado con la API directamente: mismos valores.
+- [x] Estadio "La Bombonera" sin ciudad → "Agregá la ciudad del partido para ver el clima." Al editarlo y poner "Buenos Aires" → se guarda en Firestore y aparece el clima.
+- [x] Ciudad inexistente → "No encontramos la ciudad…".
+- [x] Falla de la API (simulada) → "No pudimos cargar el clima. Reintentar"; al reintentar con la API funcionando, aparece el clima.
+- [x] Celular (375 px): sin scroll horizontal. Consola sin errores. `npm run build` compila.

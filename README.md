@@ -11,6 +11,7 @@ Aplicación web para hinchas de River Plate: un **diario digital del hincha** do
 
 - [React](https://react.dev/) + [Vite](https://vite.dev/)
 - [Firebase](https://firebase.google.com/): Cloud Firestore (base de datos) y Authentication anónima
+- [Open-Meteo](https://open-meteo.com/) (API externa de clima, gratuita y sin clave)
 - [Lucide React](https://lucide.dev/) (íconos)
 - Google Fonts: Anton (títulos) e Inter (textos)
 
@@ -25,6 +26,7 @@ El escudo y las fotos de `public/images/` pertenecen al Club Atlético River Pla
 - **Estadísticas:** porcentaje de victorias, gráfico de resultados, partidos asistidos, victorias, empates, derrotas, favoritos y datos curiosos.
 - **Formulario:** validaciones con mensajes específicos, aviso de duplicados y bloqueo de doble envío.
 - **Interacciones:** las pantallas y las tarjetas aparecen con una animación suave, los números de las estadísticas "cuentan" hasta su valor, sale confeti rojo y blanco al cargar una victoria y la estrella de favorito hace un "pop". Si el sistema pide reducir el movimiento, las animaciones se desactivan.
+- **Clima del partido (API externa):** cada tarjeta muestra el pronóstico (hasta 16 días antes) o el clima que hizo ese día, con la temperatura a la hora del partido si tiene hora. En la portada aparece el pronóstico del próximo partido. Se usa la ciudad del partido o, si se juega en el Monumental, el Monumental.
 - **Mi perfil:** tu nombre (la app te saluda) y tu **grupo de cancha**: las personas con las que vas. En cada partido marcás con quién fuiste y en Estadísticas aparece "Con quién fuiste más".
 
 ## Instalación y ejecución local
@@ -78,6 +80,7 @@ Colección `matches`. Cada documento es un partido:
 | `time`        | string             | Hora `HH:MM` (opcional, desde la versión 2)      |
 | `competition` | string             | Competición                                      |
 | `stadium`     | string             | Estadio o ubicación                              |
+| `city`        | string             | Ciudad, para el clima (opcional, versión 6)      |
 | `riverGoals`  | number \| null     | Goles de River (`null` = sin resultado)          |
 | `rivalGoals`  | number \| null     | Goles del rival (`null` = sin resultado)         |
 | `status`      | string             | `proximo`, `asisti` o `no_asisti`                |
@@ -111,7 +114,9 @@ src/
 │   └── config.js           # Inicializa Firebase con las variables de .env
 ├── services/
 │   ├── authService.js      # Inicio de sesión anónimo
-│   └── matchesService.js   # CRUD de partidos en Firestore
+│   ├── matchesService.js   # CRUD de partidos en Firestore
+│   ├── profileService.js   # Perfil y grupo de cancha
+│   └── weatherService.js   # Clima con la API de Open-Meteo
 ├── utils/
 │   └── matchUtils.js       # Estados, formato de fechas y cálculo de estadísticas
 ├── components/             # Piezas reutilizables (tarjetas, formulario, modal...)
@@ -129,6 +134,7 @@ src/
 - **Modificar:** `updateMatch()` (usa `updateDoc`) — editar, favorito y cambio de estado
 - **Eliminar:** `deleteMatch()` (usa `deleteDoc`)
 - **Perfil:** `getProfile()` y `saveProfile()` en `src/services/profileService.js` (usan `getDoc` y `setDoc`)
+- **Clima (API externa):** `getMatchWeather()` en `src/services/weatherService.js` (usa `fetch` a Open-Meteo) y el componente `src/components/WeatherInfo.jsx`.
 - Estas funciones se llaman desde `src/App.jsx` (`handleSave`, `handleConfirmDelete`, `quickUpdate`).
 
 ## Despliegue en Vercel

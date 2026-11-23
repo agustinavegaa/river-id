@@ -20,6 +20,7 @@ const EMPTY_FORM = {
   time: '',
   competition: '',
   stadium: '',
+  city: '',
   riverGoals: '',
   rivalGoals: '',
   status: STATUS.ATTENDED,
@@ -38,6 +39,7 @@ function toFormValues(match, defaults) {
     time: match.time ?? '',
     competition: match.competition ?? '',
     stadium: match.stadium ?? '',
+    city: match.city ?? '',
     riverGoals: match.riverGoals ?? '',
     rivalGoals: match.rivalGoals ?? '',
     status: match.status ?? STATUS.ATTENDED,
@@ -151,6 +153,7 @@ function MatchForm({ match, defaults, matches, companions, onSave, onClose, onOp
       time: values.time,
       competition: values.competition,
       stadium: values.stadium.trim(),
+      city: values.city.trim(),
       riverGoals: isUpcoming || values.riverGoals === '' ? null : Number(values.riverGoals),
       rivalGoals: isUpcoming || values.rivalGoals === '' ? null : Number(values.rivalGoals),
       status: values.status,
@@ -272,6 +275,18 @@ function MatchForm({ match, defaults, matches, companions, onSave, onClose, onOp
               />
             </label>
           </div>
+
+          <label className="field">
+            <span>Ciudad</span>
+            <input
+              name="city"
+              value={values.city}
+              onChange={handleChange}
+              placeholder="Ej: Avellaneda, Córdoba, Montevideo"
+              maxLength={60}
+            />
+            <small className="field-hint">Opcional. Sirve para mostrar el clima. Si es en el Monumental, dejala vacía.</small>
+          </label>
         </section>
 
         {/* ---------- Estado y resultado ---------- */}

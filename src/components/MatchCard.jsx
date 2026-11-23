@@ -12,6 +12,7 @@ import {
   hasResult,
   isPastUpcoming,
 } from '../utils/matchUtils'
+import WeatherInfo from './WeatherInfo'
 
 // Tarjeta que muestra la información de un partido y sus acciones.
 function MatchCard({ match, busy, onEdit, onDelete, onToggleFavorite, onChangeStatus }) {
@@ -71,9 +72,9 @@ function MatchCard({ match, busy, onEdit, onDelete, onToggleFavorite, onChangeSt
             <Trophy size={16} /> {match.competition}
           </li>
         )}
-        {match.stadium && (
+        {(match.stadium || match.city) && (
           <li>
-            <MapPin size={16} /> {match.stadium}
+            <MapPin size={16} /> {[match.stadium, match.city].filter(Boolean).join(' · ')}
           </li>
         )}
         {match.companions?.length > 0 && (
@@ -82,6 +83,9 @@ function MatchCard({ match, busy, onEdit, onDelete, onToggleFavorite, onChangeSt
           </li>
         )}
       </ul>
+
+      {/* Clima del partido (API externa Open-Meteo) */}
+      <WeatherInfo match={match} />
 
       {match.comment && (
         <p className="match-comment">

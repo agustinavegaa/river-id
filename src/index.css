@@ -1214,6 +1214,54 @@ code {
   color: var(--red);
 }
 
+/* ---------- Clima del partido (Open-Meteo) ---------- */
+.weather {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-small);
+  font-size: 0.85rem;
+}
+
+.weather-icon {
+  flex-shrink: 0;
+  color: var(--red);
+}
+
+.weather-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.weather-text small {
+  color: var(--gray-text);
+}
+
+.weather-muted {
+  color: var(--gray-text);
+}
+
+.weather-muted svg {
+  flex-shrink: 0;
+}
+
+.weather-muted .link-btn {
+  display: inline-flex;
+  font-size: 0.85rem;
+}
+
+.weather-hero {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+}
+
 .past-notice {
   margin: 0;
   padding: 8px 12px;
